@@ -1,0 +1,14 @@
+### Example user template template
+### Example user template
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+!/common/tlgRobot.py
+!/conf/config.ini
+!/data/loginDev.yaml
+!/data/vehicleNo.csv
+!/logs/
+!/testcase/
