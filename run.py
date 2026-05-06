@@ -19,11 +19,7 @@ if __name__ == '__main__':
         webbrowser.open_new_tab(os.getcwd() + '/report/tmreport/testReport.html')
 
 
-# import shutil
-# import pytest
-# import os
-# import webbrowser
-# from conf.setting import REPORT_TYPE
+#下面是用xdist分布式执行的时候用的run
 #
 # if __name__ == '__main__':
 #
