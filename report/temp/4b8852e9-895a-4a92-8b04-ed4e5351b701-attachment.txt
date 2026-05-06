@@ -1,0 +1,12 @@
+INFO     common.recordlog:conftest.py:21 -------------接口测试开始--------------
+INFO     common.recordlog:sendrequest.py:139 接口名称：个人信息
+INFO     common.recordlog:sendrequest.py:140 请求地址：https://ua.k5615.com/kk/promen/member/info
+INFO     common.recordlog:sendrequest.py:141 请求方式：Get
+INFO     common.recordlog:sendrequest.py:142 测试用例名称：获取个人信息
+INFO     common.recordlog:sendrequest.py:143 请求头：{'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'pmtoken': '42c9276d41c94f0cb0f5ec2ffed782aa', 'device': '1'}
+INFO     common.recordlog:sendrequest.py:144 Cookie：None
+INFO     common.recordlog:sendrequest.py:112 接口返回信息：{"code":0,"msg":"in消息_查询成功","data":{"memberId":"1586924314353995831","memberAccount":"manson001","vip":2,"regDays":1284,"balance":"0.00","frozen":"14426.30","profile":4,"profileUrl":"https://sundeck-static-uat.kkcp2021.vip/public/profile/4.jpg","realName":"uam****","gender":"女","birthday":"2022-11-01","mobile":"1338866****","email":"123@****","qq":"1234****","wechat":"1234****","telegram":"1234****","facebook":"hbnn****","whatsapp":"1234****","line":"1234****","fundPwdOk":true}}
+INFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{'contains': {'msg': '查询成功'}}]
+INFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【查询成功】,实际结果【in消息_查询成功】
+INFO     common.recordlog:assertions.py:198 测试成功
+INFO     common.recordlog:conftest.py:23 -------------接口测试结束--------------

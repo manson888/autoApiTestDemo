@@ -1,0 +1,18 @@
+{
+    "code": 0,
+    "msg": "in消息_操作成功",
+    "data": {
+        "orderId": "2051921159947026455",
+        "rate": "1.00",
+        "giveAmtPer": "7.00",
+        "amt": "111.00",
+        "amtAct": "111.00",
+        "bankLogo": "https://sundeck-static-uat.kkcp2021.vip/public/bank/001_zgyh.png",
+        "bankName": "中国银行",
+        "bankNameSub": "测试",
+        "cardName": "阿月",
+        "cardNo": "123456789",
+        "createAt": "2026-05-06 15:05:02",
+        "expire": 900
+    }
+}

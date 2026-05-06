@@ -1,0 +1,632 @@
+{
+    "code": 0,
+    "msg": "in消息_查询成功",
+    "data": [
+        {
+            "code": "card",
+            "name": "银行卡转卡",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0101_card.png",
+            "type": 1,
+            "recommend": true,
+            "currName": "人民币",
+            "currUnit": "元",
+            "rate": "1.00",
+            "giveAmtPer": "7",
+            "list": [
+                {
+                    "minAmt": "1",
+                    "maxAmt": "5000"
+                },
+                {
+                    "minAmt": "20",
+                    "maxAmt": "200"
+                }
+            ]
+        },
+        {
+            "code": "unionpay",
+            "name": "网银转账",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0201_unionpay.png",
+            "type": 2,
+            "recommend": true,
+            "currName": "人民币",
+            "currUnit": "元",
+            "rate": "1.00",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 88,
+                    "minAmt": "1",
+                    "maxAmt": "10000",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 109,
+                    "minAmt": "2",
+                    "maxAmt": "2",
+                    "realNameNeed": false,
+                    "recommend": true
+                },
+                {
+                    "id": 75,
+                    "minAmt": "10",
+                    "maxAmt": "100",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 113,
+                    "minAmt": "10",
+                    "maxAmt": "10002",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 111,
+                    "minAmt": "10",
+                    "maxAmt": "10003",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 90,
+                    "minAmt": "20",
+                    "maxAmt": "10000",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 91,
+                    "minAmt": "30",
+                    "maxAmt": "30000",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 97,
+                    "minAmt": "99",
+                    "maxAmt": "10000",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 112,
+                    "minAmt": "100",
+                    "maxAmt": "1006",
+                    "realNameNeed": true,
+                    "recommend": false
+                },
+                {
+                    "id": 82,
+                    "minAmt": "100",
+                    "maxAmt": "3000",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 115,
+                    "minAmt": "100",
+                    "maxAmt": "3003",
+                    "realNameNeed": true,
+                    "recommend": false
+                },
+                {
+                    "id": 92,
+                    "minAmt": "1000",
+                    "maxAmt": "8000",
+                    "realNameNeed": false,
+                    "recommend": false
+                }
+            ]
+        },
+        {
+            "code": "ecny",
+            "name": "数字人民币",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0203_ecny.png",
+            "type": 2,
+            "recommend": false,
+            "currName": "人民币",
+            "currUnit": "元",
+            "rate": "1.00",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 108,
+                    "minAmt": "8",
+                    "maxAmt": "8",
+                    "realNameNeed": true,
+                    "recommend": true
+                },
+                {
+                    "id": 69,
+                    "minAmt": "100",
+                    "maxAmt": "5000",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 119,
+                    "minAmt": "100",
+                    "maxAmt": "5003",
+                    "realNameNeed": false,
+                    "recommend": false
+                }
+            ]
+        },
+        {
+            "code": "alipay",
+            "name": "支付宝",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0204_alipay.png",
+            "type": 2,
+            "recommend": false,
+            "currName": "人民币",
+            "currUnit": "元",
+            "rate": "1.00",
+            "giveAmtPer": "0",
+            "list": [
+                {
+                    "id": 89,
+                    "minAmt": "1",
+                    "maxAmt": "10000",
+                    "realNameNeed": true,
+                    "recommend": true
+                },
+                {
+                    "id": 126,
+                    "minAmt": "2",
+                    "maxAmt": "11",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 84,
+                    "minAmt": "5",
+                    "maxAmt": "10",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 125,
+                    "minAmt": "5",
+                    "maxAmt": "100",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 105,
+                    "minAmt": "10",
+                    "maxAmt": "501",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 106,
+                    "minAmt": "10",
+                    "maxAmt": "1001",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 121,
+                    "minAmt": "10",
+                    "maxAmt": "2002",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 77,
+                    "minAmt": "10",
+                    "maxAmt": "100000",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 118,
+                    "minAmt": "100",
+                    "maxAmt": "200",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 98,
+                    "minAmt": "100",
+                    "maxAmt": "20001",
+                    "realNameNeed": true,
+                    "recommend": false
+                },
+                {
+                    "id": 117,
+                    "minAmt": "200",
+                    "maxAmt": "503",
+                    "realNameNeed": true,
+                    "recommend": false
+                },
+                {
+                    "id": 116,
+                    "minAmt": "200",
+                    "maxAmt": "5003",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 120,
+                    "minAmt": "300",
+                    "maxAmt": "1005",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 104,
+                    "minAmt": "2000",
+                    "maxAmt": "20001",
+                    "realNameNeed": false,
+                    "recommend": false
+                }
+            ]
+        },
+        {
+            "code": "wechat",
+            "name": "微信",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0205_wechat.png",
+            "type": 2,
+            "recommend": false,
+            "currName": "人民币",
+            "currUnit": "元",
+            "rate": "1.00",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 87,
+                    "minAmt": "10",
+                    "maxAmt": "10000",
+                    "realNameNeed": false,
+                    "recommend": true
+                },
+                {
+                    "id": 81,
+                    "minAmt": "50",
+                    "maxAmt": "200",
+                    "realNameNeed": false,
+                    "recommend": false
+                },
+                {
+                    "id": 78,
+                    "minAmt": "50",
+                    "maxAmt": "100000",
+                    "realNameNeed": true,
+                    "recommend": false
+                }
+            ]
+        },
+        {
+            "code": "qq",
+            "name": "QQ支付",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0206_qq.png",
+            "type": 2,
+            "recommend": false,
+            "currName": "人民币",
+            "currUnit": "元",
+            "rate": "1.00",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 55,
+                    "minAmt": "1",
+                    "maxAmt": "123",
+                    "realNameNeed": true,
+                    "recommend": true
+                },
+                {
+                    "id": 110,
+                    "minAmt": "1",
+                    "maxAmt": "888",
+                    "realNameNeed": true,
+                    "recommend": false
+                },
+                {
+                    "id": 68,
+                    "minAmt": "10",
+                    "maxAmt": "200",
+                    "realNameNeed": false,
+                    "recommend": false
+                }
+            ]
+        },
+        {
+            "code": "usdt",
+            "name": "USDT存款",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0301_usdt.png",
+            "type": 3,
+            "recommend": true,
+            "currName": "USDT",
+            "currUnit": "USDT",
+            "rate": "7.25",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "coinKind": "USDT",
+                    "coinNetwork": "TRC20",
+                    "list": [
+                        {
+                            "minAmt": "100",
+                            "maxAmt": "10000"
+                        },
+                        {
+                            "minAmt": "100",
+                            "maxAmt": "55555"
+                        }
+                    ]
+                },
+                {
+                    "coinKind": "USDT",
+                    "coinNetwork": "ERC20",
+                    "list": [
+                        {
+                            "minAmt": "1",
+                            "maxAmt": "99999999"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "code": "ebpay",
+            "name": "EBpay",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0401_ebpay.png",
+            "type": 4,
+            "recommend": true,
+            "currName": "EB",
+            "currUnit": "EB",
+            "rate": "1.00",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 56,
+                    "minAmt": "100",
+                    "maxAmt": "1000",
+                    "recommend": true
+                }
+            ]
+        },
+        {
+            "code": "yibifu",
+            "name": "易币付",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0402_yibifu.png",
+            "type": 4,
+            "recommend": true,
+            "currName": "USDT",
+            "currUnit": "USDT",
+            "rate": "7.00",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 57,
+                    "minAmt": "1",
+                    "maxAmt": "1000",
+                    "recommend": true
+                }
+            ]
+        },
+        {
+            "code": "topay",
+            "name": "ToPay",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0403_topay.png",
+            "type": 4,
+            "recommend": true,
+            "currName": "TOG",
+            "currUnit": "TOG",
+            "rate": "1.00",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 58,
+                    "minAmt": "10",
+                    "maxAmt": "1000",
+                    "recommend": true
+                }
+            ]
+        },
+        {
+            "code": "gopay",
+            "name": "GoPay",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0404_gopay.png",
+            "type": 4,
+            "recommend": true,
+            "currName": "GOP",
+            "currUnit": "GOP",
+            "rate": "1.00",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 59,
+                    "minAmt": "10",
+                    "maxAmt": "10000",
+                    "recommend": true
+                }
+            ]
+        },
+        {
+            "code": "okpay",
+            "name": "OKPay",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0405_okpay.png",
+            "type": 4,
+            "recommend": true,
+            "currName": "OKG",
+            "currUnit": "OKG",
+            "rate": "1.00",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 64,
+                    "minAmt": "10",
+                    "maxAmt": "100000",
+                    "recommend": false
+                }
+            ]
+        },
+        {
+            "code": "wanbi",
+            "name": "万币",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0406_wanbi.png",
+            "type": 4,
+            "recommend": false,
+            "currName": "WB",
+            "currUnit": "WB",
+            "rate": "7.22",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 65,
+                    "minAmt": "10",
+                    "maxAmt": "100000",
+                    "recommend": true
+                }
+            ]
+        },
+        {
+            "code": "mipay",
+            "name": "MiPay",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0407_mipay.png",
+            "type": 4,
+            "recommend": false,
+            "currName": "MI",
+            "currUnit": "MI",
+            "rate": "1.00",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 66,
+                    "minAmt": "10",
+                    "maxAmt": "100000",
+                    "recommend": true
+                }
+            ]
+        },
+        {
+            "code": "koipay",
+            "name": "KoiPay",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0408_koipay.png",
+            "type": 4,
+            "recommend": true,
+            "currName": "KB",
+            "currUnit": "KB",
+            "rate": "1.00",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 74,
+                    "minAmt": "10",
+                    "maxAmt": "1000",
+                    "recommend": true
+                }
+            ]
+        },
+        {
+            "code": "mpay",
+            "name": "MPay",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0409_mpay.png",
+            "type": 4,
+            "recommend": true,
+            "currName": "MP",
+            "currUnit": "MP",
+            "rate": "1.00",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 85,
+                    "minAmt": "5",
+                    "maxAmt": "10000",
+                    "recommend": true
+                }
+            ]
+        },
+        {
+            "code": "qianneng",
+            "name": "钱能",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0410_qianneng.png",
+            "type": 4,
+            "recommend": true,
+            "currName": "QNC",
+            "currUnit": "QNC",
+            "rate": "1.00",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 101,
+                    "minAmt": "1",
+                    "maxAmt": "10000",
+                    "recommend": true
+                }
+            ]
+        },
+        {
+            "code": "kdpay",
+            "name": "K豆",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0411_kdpay.png",
+            "type": 4,
+            "recommend": true,
+            "currName": "K豆",
+            "currUnit": "K豆",
+            "rate": "1.00",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 123,
+                    "minAmt": "100",
+                    "maxAmt": "10000",
+                    "recommend": true
+                }
+            ]
+        },
+        {
+            "code": "bobi",
+            "name": "波币",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0412_bobi.png",
+            "type": 4,
+            "recommend": true,
+            "currName": "波币",
+            "currUnit": "波币",
+            "rate": "1.00",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 124,
+                    "minAmt": "100",
+                    "maxAmt": "10000",
+                    "recommend": true
+                }
+            ]
+        },
+        {
+            "code": "u234",
+            "name": "234币",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0413_u234.png",
+            "type": 4,
+            "recommend": true,
+            "currName": "234币",
+            "currUnit": "B",
+            "rate": "1.00",
+            "giveAmtPer": "5",
+            "list": [
+                {
+                    "id": 127,
+                    "minAmt": "10",
+                    "maxAmt": "10000",
+                    "recommend": true
+                }
+            ]
+        },
+        {
+            "code": "vip",
+            "name": "VIP代充",
+            "logo": "https://sundeck-static-uat.kkcp2021.vip/public/cashin/0501_vip.png",
+            "type": 5,
+            "recommend": true,
+            "currName": "人民币",
+            "currUnit": "元",
+            "giveAmtPer": "10",
+            "url": "https://www.baidu.com"
+        }
+    ]
+}

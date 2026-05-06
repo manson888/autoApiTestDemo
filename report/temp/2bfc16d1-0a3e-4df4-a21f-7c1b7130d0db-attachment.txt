@@ -1,0 +1,11 @@
+{
+    "code": 0,
+    "msg": "in消息_登录成功",
+    "data": {
+        "memberId": "1586924314353995831",
+        "memberAccount": "manson001",
+        "balance": 0.0,
+        "tokenName": "pmToken",
+        "token": "42c9276d41c94f0cb0f5ec2ffed782aa"
+    }
+}

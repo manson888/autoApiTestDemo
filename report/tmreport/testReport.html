@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>tmreport</title>
+  <meta charset="UTF-8">
+  <!-- import CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<!--  <script src="echarts.min.js"></script>-->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js"></script>
+   <!--导入js库-->
+  <script src="https://cdn.bootcss.com/ace/1.2.6/ace.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+  <div id="app">
+    <el-container>
+      <el-header>
+        <h2 class="el-icon-document-copy">自动化测试报告</h2>
+      </el-header>
+      <el-container>
+        <el-aside width="500px" style="margin-top: 20px">
+          <el-card shadow="hover" style=";margin-bottom: 20px">
+            <h3>执行成功率</h3>
+            <div id="main" style="width: 500px;height:430px"></div>
+          </el-card>
+          <el-card shadow="hover">
+            <div id="main2" style="width: 500px;height:430px;"></div>
+          </el-card>
+        </el-aside>
+        <el-main>
+           <el-row>
+             <el-col :span="7">
+                <el-card shadow="hover">
+                  <span style="font-size: small ">本次执行情况</span>
+                   <el-tag type="primary" label="执行结果" effect="dark" style="float: right" size="small">执行</el-tag>
+                  <el-divider></el-divider>
+                  <span style="font-size: large; color: dodgerblue">本次共执行用例 {{summary.total}} 条</span>
+                  <el-divider></el-divider>
+                  <span style="font-size: small ">成功率 {{(summary.success_rate * 100).toFixed(2)}}% </span>
+                </el-card>
+             </el-col>
+             <el-col :span="7">
+                <el-card shadow="hover">
+                  <span style="font-size: small ">异常情况</span>
+                   <el-tag type="danger" label="执行结果" effect="dark" style="float: right" size="small">异常</el-tag>
+                  <el-divider></el-divider>
+                  <span style="font-size: large; color: indianred">本次共有失败用例 {{summary.failed}} 条</span>
+                  <el-divider></el-divider>
+                  <span style="font-size: small ">失败率 {{(summary.fail_rate * 100).toFixed(2)}}% </span>
+                </el-card>
+             </el-col>
+             <el-col :span="7">
+                <el-card shadow="hover">
+                  <span style="font-size: small ">持续执行</span>
+                   <el-tag type="warning" label="执行结果" effect="dark" style="float: right" size="small">持续</el-tag>
+                  <el-divider></el-divider>
+                  <span style="font-size: large; color: #e6a23c">本次持续运行 {{summary.duration.toFixed(4)}}s</span>
+                  <el-divider></el-divider>
+                  <span style="font-size: small ">平均Case执行时间 {{(summary.avg_duration * 1000).toFixed(2)}} ms</span>
+                </el-card>
+             </el-col>
+           </el-row>
+           <el-card shadow="hover" style="margin-top: 20px">
+             <h3>用例执行记录</h3>
+             <el-alert
+                     class="el-icon-info"
+                    title="点击可展开下方详细日志"
+                    type="warning"
+                    effect="dark">
+              </el-alert>
+              <el-table
+                :data="data.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                stripe
+                style="width: 100%"
+                height="600"
+                size="medium"
+                @expand-change="expend"
+                :row-key='getRowKeys'
+                :expand-row-keys="expands"
+                @filter-change="fliterChange"
+              >
+                 <el-table-column type="expand"  width="100" prop="logs">
+                  <template slot-scope="scope">
+                      <el-card class="content">
+                          <pre id="editor" class="ace_editor" style="min-height:400px">
+                            <textarea class="ace_text-input">{{scope.row.logs}}</textarea>
+                          </pre>
+                          <script type="application/javascript">
+                            var editor = ace.edit('editor')
+                              //设置风格和语言（更多风格和语言，请到github上相应目录查看）
+                            theme = "clouds"
+                            language = "python"
+                            editor.setTheme("ace/theme/" + theme);
+                            editor.session.setMode("ace/mode/" + language);
+
+                            //字体大小
+                            editor.setFontSize(10);
+
+                            //设置只读（true时只读，用于展示代码）
+                            editor.setReadOnly(true);
+
+                            //自动换行,设置为off关闭
+                            editor.setOption("wrap", "free")
+
+                          </script>
+                      </el-card>
+                     </template>
+                  </el-table-column>
+                <el-table-column
+                  label="ID"
+                  type="index"
+                  :index="count"
+                  width="80"
+                >
+                </el-table-column>
+                <el-table-column
+                  prop="title"
+                  label="Case"
+                  width="300"
+                >
+                </el-table-column>
+
+                <el-table-column
+                  prop="time"
+                  label="Time"
+                  width="200">
+                </el-table-column>
+                <el-table-column
+                  prop="result"
+                  label="Result"
+                  :filters="[{ text: '成功', value: 1 }, { text: '失败', value: 0 }]"
+                  column-key="result"
+                  width="100"
+                >
+                  <template slot-scope="scope">
+                    <i class="el-icon-circle-check" style="color: green;font-size: large" v-if="scope.row.result==1"></i>
+                    <i class="el-icon-circle-close" style="color: red;font-size: large" v-if="scope.row.result==0"></i>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  prop="doc"
+                  label="Doc"
+                  width="250">
+                </el-table-column>
+                <el-table-column
+                  prop="duration"
+                  label="Duration"
+                  width="150">
+                  <template slot-scope="scope">
+                    <span>{{(scope.row.duration*1000).toFixed(2)}} ms</span>
+                  </template>
+                </el-table-column>
+
+              </el-table>
+               <div class="block" style="margin-top: 20px">
+                    <el-pagination
+                      @size-change="handleSizeChange"
+                      @current-change="handleCurrentChange"
+                      :current-page="currentPage"
+                      :page-sizes="[10, 20, 50, 100]"
+                      :page-size="pageSize"
+                      layout="total, sizes, prev, pager, next, jumper"
+                      :total="data.length">
+                    </el-pagination>
+                  </div>
+           </el-card>
+        </el-main>
+      </el-container>
+    </el-container>
+  </div>
+</body>
+
+  <!-- import Vue before Element -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.8/dist/vue.js"></script>
+  <!-- import JavaScript -->
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+
+  <script>
+
+    new Vue({
+      el: '#app',
+      data: function() {
+        return {
+          visible: false,
+          dialogVisible: false,
+          data: [],
+          tableData: [{'id': 1777034199.364065, 'title': 'testcase/Business interface/test_business_scenario.py::TestEBusinessScenario::test_business_scenario[case_info0]', 'logs': 'Captured log setup\nERROR    common.recordlog:removefile.py:28 [Errno 2] No such file or directory: \'./report/temp\\\\96deacc4-0c4e-42c8-aae5-254d92d86408-attachment.attach\'\nINFO     common.recordlog:sendrequest.py:135 接口名称：用户登录\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/dar/user/login\nINFO     common.recordlog:sendrequest.py:137 请求方式：post\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：用户名和密码正确登录验证\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/x-www-form-urlencoded;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:144 请求参数：{\'data\': {\'user_name\': \'test01\', \'passwd\': \'admin123\'}}\nINFO     common.recordlog:sendrequest.py:107 cookie：{\'Cookie\': {\'access_token_cookie\': \'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NzAzNDE5OSwianRpIjoiYjUzMmI4ZWMtMzM0Ni00YmFkLTkzYmEtNjNiZGU5MTliYjZkIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImV4YW1wbGVfdXNlciIsIm5iZiI6MTc3NzAzNDE5OSwiY3NyZiI6IjgzNjhiNTJmLTIyNDUtNDdlNy04ZWUzLWUwNTUyYzJhMTY4OSIsImV4cCI6MTc3NzAzNTA5OX0.FN-PAkPw3UlzeQEKIZEVbufkugI755QmiroEzvV9584\', \'csrf_access_token\': \'8368b52f-2245-47e7-8ee3-e0552c2a1689\'}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "error_code": null,\n  "msg": "\\u767b\\u5f55\\u6210\\u529f",\n  "msg_code": 200,\n  "orgId": "6140913758128971280",\n  "token": "49BbCD1EA59DF4Ac726F3FeFa3Fcf",\n  "userId": "9841004521408302057"\n}\n\nINFO     common.recordlog:apiutil.py:154 提取接口的返回值：\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'contains\': {\'error_code\': \'none\'}}, {\'eq\': {\'msg\': \'登录成功\'}}]\nINFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【None】,实际结果【[None]】\nINFO     common.recordlog:assertions.py:68 相等断言成功：接口实际结果：{\'msg\': \'登录成功\'}，等于预期结果：{\'msg\': \'登录成功\'}\nINFO     common.recordlog:assertions.py:198 测试成功\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：商品列表\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/coupApply/cms/goodsList\nINFO     common.recordlog:sendrequest.py:137 请求方式：Get\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：获取商品列表\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/x-www-form-urlencoded;charset=UTF-8\', \'token\': \'49BbCD1EA59DF4Ac726F3FeFa3Fcf\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:150 请求参数：{\'params\': {\'msgType\': \'getHandsetListOfCust\', \'page\': 1, \'size\': 20}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "api_info": "today:21 max:10000 all[90=21+33+36];expires:2030-12-31",\n  "cache": 0,\n  "error_code": "0000",\n  "goodsList": [\n    {\n      "goodsId": "18382788819",\n      "goods_count": "233",\n      "goods_image": "https://omsproductionimg.yangkeduo.com/images/2017-12-12/bcf848aa71c6389607ae7a84b70f1543.jpeg",\n      "goods_name": "\\u30102\\u4ef6\\u5957\\u3011\\u5957\\u88c5\\u79cb\\u51ac\\u65b0\\u6b3e\\u4eff\\u736d\\u5154\\u6bdb\\u9489\\u73e0\\u76ae\\u8349\\u6bdb\\u6bdb\\u77ed\\u5916\\u5957\\u52a0\\u539a\\u5927\\u8863\\u5973\\u88c5",\n      "original_price": "",\n      "unit_price": "\\uffe599.00"\n    },\n    {\n      "goodsId": "33809635011",\n      "goods_count": "521",\n      "goods_image": "https://omsproductionimg.yangkeduo.com/images/2017-12-12/176019babfdecffa1d9f98f40b7e99b4.jpeg",\n      "goods_name": "\\u597d\\u5947\\u5c0f\\u68ee\\u6797\\u5fc3\\u94bb\\u88c5\\u7eb8\\u5c3f\\u88e4M22\\u62c9\\u62c9\\u88e4L18/XL14\\u8d85\\u8584\\u900f\\u6c14\\u88e4\\u578b\\u5c3f\\u4e0d\\u6e7f 1\\u4ef6\\u88c5",\n      "original_price": "",\n      "unit_price": "\\uffe5108.00"\n    },\n    {\n      "goodsId": "56996760797",\n      "goods_count": "1181",\n      "goods_image": "https://omsproductionimg.yangkeduo.com/images/2017-12-12/efb5db42397550bffd3211ca6f197498.jpeg",\n      "goods_name": "\\u51bb\\u5e72\\u9e21\\u5c0f\\u80f8\\u6574\\u5757\\u589e\\u80a5\\u8425\\u517b\\u53d1\\u816e\\u72d7\\u72d7\\u96f6\\u98df\\u65b0\\u624b\\u517b\\u732b\\u96f6\\u98df\\u5e7c\\u732b\\u96f6\\u98df100g",\n      "original_price": "",\n      "unit_price": "\\uffe517.80"\n    },\n    {\n      "goodsId": "82193785267",\n      "goods_count": "3000+",\n      "goods_image": "https://omsproductionimg.yangkeduo.com/images/2017-12-12/efb5db42397550bffd3211ca6f197498.jpeg",\n      "goods_name": "\\u3010\\u81ea\\u8425\\u3011ISB\\u4f0a\\u73ca\\u5a1c\\u610f\\u5927\\u5229\\u6c34\\u679c\\u7cfb\\u5217\\u5ba0\\u7269\\u72ac\\u732b\\u6c90\\u6d74\\u9732\\u9664\\u81ed\\u9999\\u6ce2\\u62a4\\u6bdb\\u7d20",\n      "original_price": "",\n      "unit_price": "\\uffe5650.00"\n    },\n    {\n      "goodsId": "74190550836",\n      "goods_count": "1000+",\n      "goods_image": "https://omsproductionimg.yangkeduo.com/images/2017-12-12/efb5db42397550bffd3211ca6f197498.jpeg",\n      "goods_name": "\\u3010\\u65b0\\u54c1\\u96f60CM\\u5d4c\\u5165\\u5f0f\\u3011\\u6d77\\u5c14\\u7535\\u51b0\\u7bb1410L\\u5bb6\\u7528\\u6cd5\\u5f0f\\u56db\\u95e8\\u591a\\u95e8\\u5b98\\u65b9\\u6b63\\u54c1",\n      "original_price": "",\n      "unit_price": "\\uffe55746.00"\n    }\n  ],\n  "reason": "",\n  "request_id": "request_id",\n  "secache": "c98b29872e8a4b28859db207944ba817",\n  "secache_date": "2026-04-23 11:38:05",\n  "secache_time": 1776915485000,\n  "translate_language": "zh-CN"\n}\n\nINFO     common.recordlog:apiutil_business.py:201 json提取到参数：{\'goodsIds\': [\'18382788819\', \'33809635011\', \'56996760797\', \'82193785267\', \'74190550836\']}\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'contains\': {\'error_code\': \'0000\'}}]\nINFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【0000】,实际结果【0000】\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.014795577999999754, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.395255, 'title': 'testcase/Business interface/test_business_scenario.py::TestEBusinessScenario::test_business_scenario[case_info1]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：商品详情\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/coupApply/cms/productDetail\nINFO     common.recordlog:sendrequest.py:137 请求方式：post\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：获取商品详情\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/json;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:147 请求参数：{\'json\': {\'pro_id\': \'18382788819\', \'page\': 1, \'size\': 20}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "api_info": "today:21 max:10000 all[90=21+33+36];expires:2030-12-31",\n  "api_type": "pinduoduo",\n  "cache": 0,\n  "call_args": {\n    "num_iid": "1620002566"\n  },\n  "client_ip": "106.6.39.223",\n  "error": "",\n  "error_code": "0000",\n  "execution_time": "0.437",\n  "goodsId": "74190550836",\n  "item": {\n    "AmountOnSale": 3188,\n    "CategoryId": 8484,\n    "Coupon": null,\n    "Delivery": {\n      "From": null,\n      "Info": null,\n      "MarkInfo": null,\n      "Postage": "\\u5feb\\u9012 \\u514d\\u8fd0\\u8d39",\n      "To": null,\n      "extras": null\n    },\n    "DescUrl": null,\n    "Detail": "<img src=\\"https://img.pddpic.com/mms-material-img/2022-09-18/3f89d470-1af8-4dee-b529-6d62aa2ea3b7.png\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2019-02-15/ddf6fe7b-b536-4183-932d-69a1189a3f59.png\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-09-02/20f659b04d3e7e5851c27ff9931c96fc.jpeg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2019-11-14/4420a8c3-49ed-46d8-ab55-15e7a638ca31.jpg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-09-02/26c3e9d5cfbaf4e8f13b2bdd38f48d71.jpeg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-09-02/0aa872fa74599dad7b6aefe6b6c035c0.jpeg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-09-02/6bc959e32a30424c7a5284a37676999c.jpeg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-09-02/1fa9861a8c99c5e9e8119fd2239fef5a.jpeg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-09-02/b62cabf1d2320c5761e3f4c15203fb20.jpeg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-09-02/6f6e54376a66cbc78e16700d4c424fe1.jpeg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-09-02/2f60753dfc875a6876adc35833a69d31.jpeg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-09-02/ae0116e589d8de712f8dafd0c356cefe.jpeg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-09-02/da910c98fcc8de1b4d2d1498cd7899fd.jpeg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-09-02/140349649d8b7d08c8e88bfbbaa2f900.jpeg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-09-02/a953bae2eeb7364ef3ef2976a97d07eb.jpeg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-09-02/4da59828136c3b1308aad0aa990778a7.jpeg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-09-02/4a365b61a80e47288c8609ccd5982396.jpeg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-11-17/cd0a8a96b783a51236812ce24c59a329.jpeg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-11-17/16008ac19768d05e7dee16406ff958a1.jpeg\\" style=\\"width:100%;\\"/><img src=\\"https://t00img.yangkeduo.com/goods/images/2018-11-17/ef1d17b69ebf9449a8bb52459b168c26.jpeg\\" style=\\"width:100%;\\"/>",\n    "FansCount": null,\n    "ImageUrls": [\n      "https://omsproductionimg.yangkeduo.com/images/2017-12-12/bcf848aa71c6389607ae7a84b70f1543.jpeg",\n      "https://omsproductionimg.yangkeduo.com/images/2017-12-12/176019babfdecffa1d9f98f40b7e99b4.jpeg",\n      "https://omsproductionimg.yangkeduo.com/images/2017-12-12/efb5db42397550bffd3211ca6f197498.jpeg",\n      "https://omsproductionimg.yangkeduo.com/images/2017-12-12/d209ef7bcc9183c3bb8ca1dfdb108d49.jpeg",\n      "https://omsproductionimg.yangkeduo.com/images/2017-12-12/74257ab65f3f00da7a90fde9042fe640.jpeg",\n      "https://t00img.yangkeduo.com/goods/images/2019-08-17/e8fbd9cb-cc74-4caa-9380-84c46d27b008.jpg",\n      "https://t00img.yangkeduo.com/goods/images/2019-08-17/d76f515b-e375-4060-b94e-cf64f6b0964e.jpg",\n      "https://t00img.yangkeduo.com/goods/images/2019-08-17/f2f279b5-6000-4fbe-b99b-7c1cbd7884ea.jpg"\n    ],\n    "MainImageVideo": null,\n    "OfferId": 1620002566,\n    "OriginalPriceRangeInfos": [\n      {\n        "ConvertPrice": 0,\n        "Price": 115,\n        "Range": "3"\n      }\n    ],\n    "PriceRangeInfos": [\n      {\n        "ConvertPrice": 0,\n        "Price": 95.4,\n        "Range": "3"\n      }\n    ],\n    "ProductFeatureTuples": [\n      {\n        "Item1": "\\u9762\\u6599\\u6750\\u8d28",\n        "Item2": "\\u4eff\\u76ae\\u8349"\n      },\n      {\n        "Item1": "\\u6210\\u5206\\u542b\\u91cf",\n        "Item2": "71%\\uff08\\u542b\\uff09\\u201480%\\uff08\\u542b\\uff09"\n      },\n      {\n        "Item1": "\\u7248\\u578b",\n        "Item2": "\\u4fee\\u8eab"\n      },\n      {\n        "Item1": "\\u9886\\u578b",\n        "Item2": "\\u5706\\u9886"\n      },\n      {\n        "Item1": "\\u8863\\u957f",\n        "Item2": "\\u77ed\\u6b3e"\n      },\n      {\n        "Item1": "\\u662f\\u5426\\u5e26\\u6bdb\\u9886",\n        "Item2": "\\u4e0d\\u5e26\\u6bdb\\u9886"\n      },\n      {\n        "Item1": "\\u4e3b\\u98ce\\u683c",\n        "Item2": "\\u6c14\\u8d28\\u540d\\u5a9b"\n      }\n    ],\n    "ProductFeatures": {\n      "\\u4e3b\\u98ce\\u683c": "\\u6c14\\u8d28\\u540d\\u5a9b",\n      "\\u6210\\u5206\\u542b\\u91cf": "71%\\uff08\\u542b\\uff09\\u201480%\\uff08\\u542b\\uff09",\n      "\\u662f\\u5426\\u5e26\\u6bdb\\u9886": "\\u4e0d\\u5e26\\u6bdb\\u9886",\n      "\\u7248\\u578b": "\\u4fee\\u8eab",\n      "\\u8863\\u957f": "\\u77ed\\u6b3e",\n      "\\u9762\\u6599\\u6750\\u8d28": "\\u4eff\\u76ae\\u8349",\n      "\\u9886\\u578b": "\\u5706\\u9886"\n    },\n    "RateCount": null,\n    "RetryCount": 0,\n    "SellCount": "\\u5df2\\u62fc4.2\\u4e07\\u4ef6",\n    "SellerId": null,\n    "SellerNick": null,\n    "ShopId": "461742",\n    "ShopInfo": null,\n    "ShopName": "\\u679c\\u679c\\u5bb6\\u6c14\\u8d28\\u5973\\u88c5",\n    "ShopUrl": "http://yangkeduo.com/mall_page.html?mall_id=461742",\n    "SkuMaps": [\n      {\n        "AmountOnSale": 73,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-08-28/062d42b525a7c786920cbb83ac772af7.jpeg",\n        "Key": "1215:1115500378;1226:119128",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "57114357891",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "S\\uff0890\\u65a4\\u4ee5\\u4e0b\\uff09",\n          "\\u989c\\u8272": "\\u7c89\\u8272\\u4e24\\u4ef6\\u5957(\\u5916\\u5957+\\u88d9\\u5b50)"\n        }\n      },\n      {\n        "AmountOnSale": 65,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-08-28/062d42b525a7c786920cbb83ac772af7.jpeg",\n        "Key": "1215:1115500378;1226:96784",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "57114357892",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "M\\uff0890-100\\u65a4\\uff09",\n          "\\u989c\\u8272": "\\u7c89\\u8272\\u4e24\\u4ef6\\u5957(\\u5916\\u5957+\\u88d9\\u5b50)"\n        }\n      },\n      {\n        "AmountOnSale": 82,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-08-28/062d42b525a7c786920cbb83ac772af7.jpeg",\n        "Key": "1215:1115500378;1226:33651",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "57114357893",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "L\\uff08100-110\\u65a4\\uff09",\n          "\\u989c\\u8272": "\\u7c89\\u8272\\u4e24\\u4ef6\\u5957(\\u5916\\u5957+\\u88d9\\u5b50)"\n        }\n      },\n      {\n        "AmountOnSale": 89,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-08-28/062d42b525a7c786920cbb83ac772af7.jpeg",\n        "Key": "1215:1115500378;1226:33652",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "57114357894",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "XL\\uff08110-120\\u65a4\\uff09",\n          "\\u989c\\u8272": "\\u7c89\\u8272\\u4e24\\u4ef6\\u5957(\\u5916\\u5957+\\u88d9\\u5b50)"\n        }\n      },\n      {\n        "AmountOnSale": 94,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-08-28/062d42b525a7c786920cbb83ac772af7.jpeg",\n        "Key": "1215:1115500378;1226:33653",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "57114357895",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "2XL\\uff08120-130\\u65a4\\uff09",\n          "\\u989c\\u8272": "\\u7c89\\u8272\\u4e24\\u4ef6\\u5957(\\u5916\\u5957+\\u88d9\\u5b50)"\n        }\n      },\n      {\n        "AmountOnSale": 105,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-08-28/062d42b525a7c786920cbb83ac772af7.jpeg",\n        "Key": "1215:1115500378;1226:33656",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "57114357896",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "3XL\\uff08130-140\\u65a4\\uff09",\n          "\\u989c\\u8272": "\\u7c89\\u8272\\u4e24\\u4ef6\\u5957(\\u5916\\u5957+\\u88d9\\u5b50)"\n        }\n      },\n      {\n        "AmountOnSale": 1051,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-08-28/415bed99d5a925123d7b7c39547205de.jpeg",\n        "Key": "1215:1115501666;1226:119128",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "57114357897",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "S\\uff0890\\u65a4\\u4ee5\\u4e0b\\uff09",\n          "\\u989c\\u8272": "\\u7c73\\u8272\\u4e24\\u4ef6\\u5957\\uff08\\u5916\\u5957+\\u88d9\\u5b50\\uff09"\n        }\n      },\n      {\n        "AmountOnSale": 88,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-08-28/415bed99d5a925123d7b7c39547205de.jpeg",\n        "Key": "1215:1115501666;1226:96784",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "57114357898",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "M\\uff0890-100\\u65a4\\uff09",\n          "\\u989c\\u8272": "\\u7c73\\u8272\\u4e24\\u4ef6\\u5957\\uff08\\u5916\\u5957+\\u88d9\\u5b50\\uff09"\n        }\n      },\n      {\n        "AmountOnSale": 80,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-08-28/415bed99d5a925123d7b7c39547205de.jpeg",\n        "Key": "1215:1115501666;1226:33651",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "57114357899",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "L\\uff08100-110\\u65a4\\uff09",\n          "\\u989c\\u8272": "\\u7c73\\u8272\\u4e24\\u4ef6\\u5957\\uff08\\u5916\\u5957+\\u88d9\\u5b50\\uff09"\n        }\n      },\n      {\n        "AmountOnSale": 660,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-08-28/415bed99d5a925123d7b7c39547205de.jpeg",\n        "Key": "1215:1115501666;1226:33652",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "57114357900",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "XL\\uff08110-120\\u65a4\\uff09",\n          "\\u989c\\u8272": "\\u7c73\\u8272\\u4e24\\u4ef6\\u5957\\uff08\\u5916\\u5957+\\u88d9\\u5b50\\uff09"\n        }\n      },\n      {\n        "AmountOnSale": 126,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-08-28/415bed99d5a925123d7b7c39547205de.jpeg",\n        "Key": "1215:1115501666;1226:33653",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "57114357901",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "2XL\\uff08120-130\\u65a4\\uff09",\n          "\\u989c\\u8272": "\\u7c73\\u8272\\u4e24\\u4ef6\\u5957\\uff08\\u5916\\u5957+\\u88d9\\u5b50\\uff09"\n        }\n      },\n      {\n        "AmountOnSale": 89,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-08-28/415bed99d5a925123d7b7c39547205de.jpeg",\n        "Key": "1215:1115501666;1226:33656",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "57114357902",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "3XL\\uff08130-140\\u65a4\\uff09",\n          "\\u989c\\u8272": "\\u7c73\\u8272\\u4e24\\u4ef6\\u5957\\uff08\\u5916\\u5957+\\u88d9\\u5b50\\uff09"\n        }\n      },\n      {\n        "AmountOnSale": 98,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-11-17/48b30664f0f7e526ab1b956e813f25cf.jpeg",\n        "Key": "1215:105309781;1226:119128",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "103851107855",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "S\\uff0890\\u65a4\\u4ee5\\u4e0b\\uff09",\n          "\\u989c\\u8272": "\\u84dd\\u8272\\u4e24\\u4ef6\\u5957\\uff08\\u5916\\u5957+\\u88d9\\u5b50\\uff09"\n        }\n      },\n      {\n        "AmountOnSale": 95,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-11-17/3660b7893ca5cda1ffcea745d10b2506.jpeg",\n        "Key": "1215:105309781;1226:96784",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "103851107856",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "M\\uff0890-100\\u65a4\\uff09",\n          "\\u989c\\u8272": "\\u84dd\\u8272\\u4e24\\u4ef6\\u5957\\uff08\\u5916\\u5957+\\u88d9\\u5b50\\uff09"\n        }\n      },\n      {\n        "AmountOnSale": 97,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-11-17/a4a5a671afbb2d8e1f4c21c0ced3bea8.jpeg",\n        "Key": "1215:105309781;1226:33651",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "103851107857",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "L\\uff08100-110\\u65a4\\uff09",\n          "\\u989c\\u8272": "\\u84dd\\u8272\\u4e24\\u4ef6\\u5957\\uff08\\u5916\\u5957+\\u88d9\\u5b50\\uff09"\n        }\n      },\n      {\n        "AmountOnSale": 97,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-11-17/f0551176629bf81f25757c160198dba1.jpeg",\n        "Key": "1215:105309781;1226:33652",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "103851107858",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "XL\\uff08110-120\\u65a4\\uff09",\n          "\\u989c\\u8272": "\\u84dd\\u8272\\u4e24\\u4ef6\\u5957\\uff08\\u5916\\u5957+\\u88d9\\u5b50\\uff09"\n        }\n      },\n      {\n        "AmountOnSale": 99,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-11-17/801a2e23140bfe76229f02aab0a8a5fe.jpeg",\n        "Key": "1215:105309781;1226:33653",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "103851107853",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "2XL\\uff08120-130\\u65a4\\uff09",\n          "\\u989c\\u8272": "\\u84dd\\u8272\\u4e24\\u4ef6\\u5957\\uff08\\u5916\\u5957+\\u88d9\\u5b50\\uff09"\n        }\n      },\n      {\n        "AmountOnSale": 100,\n        "ImageUrl": "http://t00img.yangkeduo.com/goods/images/2018-11-17/2f202934f16f0eee41257b77bf489262.jpeg",\n        "Key": "1215:105309781;1226:33656",\n        "OriginalPrice": 115,\n        "Price": 95.4,\n        "SkuId": "103851107854",\n        "SpecAttributes": {\n          "\\u5c3a\\u7801": "3XL\\uff08130-140\\u65a4\\uff09",\n          "\\u989c\\u8272": "\\u84dd\\u8272\\u4e24\\u4ef6\\u5957\\uff08\\u5916\\u5957+\\u88d9\\u5b50\\uff09"\n        }\n      }\n    ],\n    "SkuProps": [\n      {\n        "IsImg": true,\n        "Prop": "\\u989c\\u8272",\n        "Value": [\n          {\n            "imageUrl": "http://t00img.yangkeduo.com/goods/images/2018-08-28/062d42b525a7c786920cbb83ac772af7.jpeg",\n            "name": "\\u7c89\\u8272\\u4e24\\u4ef6\\u5957(\\u5916\\u5957+\\u88d9\\u5b50)",\n            "value": "1215:1115500378"\n          },\n          {\n            "imageUrl": "http://t00img.yangkeduo.com/goods/images/2018-08-28/415bed99d5a925123d7b7c39547205de.jpeg",\n            "name": "\\u7c73\\u8272\\u4e24\\u4ef6\\u5957\\uff08\\u5916\\u5957+\\u88d9\\u5b50\\uff09",\n            "value": "1215:1115501666"\n          },\n          {\n            "imageUrl": "http://t00img.yangkeduo.com/goods/images/2018-11-17/48b30664f0f7e526ab1b956e813f25cf.jpeg",\n            "name": "\\u84dd\\u8272\\u4e24\\u4ef6\\u5957\\uff08\\u5916\\u5957+\\u88d9\\u5b50\\uff09",\n            "value": "1215:105309781"\n          }\n        ]\n      },\n      {\n        "IsImg": false,\n        "Prop": "\\u5c3a\\u7801",\n        "Value": [\n          {\n            "name": "S\\uff0890\\u65a4\\u4ee5\\u4e0b\\uff09",\n            "value": "1226:119128"\n          },\n          {\n            "name": "M\\uff0890-100\\u65a4\\uff09",\n            "value": "1226:96784"\n          },\n          {\n            "name": "L\\uff08100-110\\u65a4\\uff09",\n            "value": "1226:33651"\n          },\n          {\n            "name": "XL\\uff08110-120\\u65a4\\uff09",\n            "value": "1226:33652"\n          },\n          {\n            "name": "2XL\\uff08120-130\\u65a4\\uff09",\n            "value": "1226:33653"\n          },\n          {\n            "name": "3XL\\uff08130-140\\u65a4\\uff09",\n            "value": "1226:33656"\n          }\n        ]\n      }\n    ],\n    "SourceType": 6,\n    "Subject": "\\u30102\\u4ef6\\u5957\\u3011\\u5957\\u88c5\\u79cb\\u51ac\\u65b0\\u6b3e\\u4eff\\u736d\\u5154\\u6bdb\\u9489\\u73e0\\u76ae\\u8349\\u6bdb\\u6bdb\\u77ed\\u5916\\u5957\\u52a0\\u539a\\u5927\\u8863\\u5973\\u88c5",\n    "Tag": null,\n    "Unit": null,\n    "UserId": "461742",\n    "_ddf": "app",\n    "format_check": "ok"\n  },\n  "reason": "",\n  "request_id": "gw-4.63510267214bd",\n  "secache": "c98b29872e8a4b28859db207944ba817",\n  "secache_date": "2026-04-24 20:36:39",\n  "secache_time": 1666253415,\n  "server_memory": "0.84MB",\n  "server_time": "Beijing/2023-10-20 16:10:15",\n  "translate_engine": "baidu",\n  "translate_language": "zh-CN"\n}\n\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'eq\': {\'error_code\': \'0000\'}}]\nINFO     common.recordlog:assertions.py:68 相等断言成功：接口实际结果：{\'error_code\': \'0000\'}，等于预期结果：{\'error_code\': \'0000\'}\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.01703220899999991, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.4286, 'title': 'testcase/Business interface/test_business_scenario.py::TestEBusinessScenario::test_business_scenario[case_info2]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：提交订单\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/coupApply/cms/placeAnOrder\nINFO     common.recordlog:sendrequest.py:137 请求方式：post\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：详情页面选择规格，提交订单\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/json;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:147 请求参数：{\'json\': {\'goods_id\': \'18382788819\', \'number\': 2, \'propertyChildIds\': \'2:9\', \'inviter_id\': 127839112, \'price\': \'128\', \'freight_insurance\': \'0.00\', \'discount_code\': \'002399\', \'consignee_info\': {\'name\': \'张三\', \'phone\': 13800000000, \'address\': \'北京市海淀区西三环北路74号院4栋3单元1008\'}}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "crateTime": "2026-04-24 20:36:39",\n  "error": "",\n  "error_code": "0000",\n  "message": "\\u63d0\\u4ea4\\u8ba2\\u5355\\u6210\\u529f",\n  "orderNumber": "869718131322921165041",\n  "translate_language": "zh-CN",\n  "userId": "9841004521408302057"\n}\n\nINFO     common.recordlog:apiutil_business.py:174 json提取到参数：{\'orderNumber\': \'869718131322921165041\'}\nINFO     common.recordlog:apiutil_business.py:174 json提取到参数：{\'userId\': \'9841004521408302057\'}\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'eq\': {\'message\': \'提交订单成功\'}}]\nINFO     common.recordlog:assertions.py:68 相等断言成功：接口实际结果：{\'message\': \'提交订单成功\'}，等于预期结果：{\'message\': \'提交订单成功\'}\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.017697931999999916, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.4652312, 'title': 'testcase/Business interface/test_business_scenario.py::TestEBusinessScenario::test_business_scenario[case_info3]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：订单支付\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/coupApply/cms/orderPay\nINFO     common.recordlog:sendrequest.py:137 请求方式：post\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：订单支付\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/json;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:147 请求参数：{\'json\': {\'orderNumber\': \'869718131322921165041\', \'userId\': \'9841004521408302057\', \'timeStamp\': \'1777034199\'}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "createTime": "2026-04-24 20:36:39",\n  "error": "",\n  "error_code": "0000",\n  "message": "\\u8ba2\\u5355\\u652f\\u4ed8\\u6210\\u529f",\n  "translate_language": "zh-CN"\n}\n\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'eq\': {\'message\': \'订单支付成功\'}}]\nINFO     common.recordlog:assertions.py:68 相等断言成功：接口实际结果：{\'message\': \'订单支付成功\'}，等于预期结果：{\'message\': \'订单支付成功\'}\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.021644796000000355, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.498761, 'title': 'testcase/Business interface/test_business_scenario.py::TestEBusinessScenario::test_business_scenario[case_info4]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：校验订单状态\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/coupApply/cms/checkOrderStatus\nINFO     common.recordlog:sendrequest.py:137 请求方式：post\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：校验商品订单状态\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/json;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:147 请求参数：{\'json\': {\'orderNumber\': \'869718131322921165041\', \'timeStamp\': \'1777034199\'}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "error": "",\n  "error_code": "",\n  "queryTime": "2026-04-24 20:36:39",\n  "status": "0",\n  "translate_language": "zh-CN"\n}\n\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'eq\': {\'status\': \'0\'}}]\nINFO     common.recordlog:assertions.py:68 相等断言成功：接口实际结果：{\'status\': \'0\'}，等于预期结果：{\'status\': \'0\'}\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.019924164999999938, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.530792, 'title': 'testcase/ProductManager/test_productList.py::TestLogin::test_get_product_list[base_info0-testcase0]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nERROR    common.recordlog:readyaml.py:113 【extract.yaml】没有找到：cookie,--\'cookie\'\nERROR    common.recordlog:readyaml.py:113 【extract.yaml】没有找到：cookie,--\'cookie\'\nINFO     common.recordlog:sendrequest.py:135 接口名称：商品列表\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/coupApply/cms/goodsList\nINFO     common.recordlog:sendrequest.py:137 请求方式：Get\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：获取商品列表\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/x-www-form-urlencoded;charset=UTF-8\', \'token\': \'None\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:150 请求参数：{\'params\': {\'msgType\': \'getHandsetListOfCust\', \'page\': 1, \'size\': 20}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "api_info": "today:21 max:10000 all[90=21+33+36];expires:2030-12-31",\n  "cache": 0,\n  "error_code": "0000",\n  "goodsList": [\n    {\n      "goodsId": "18382788819",\n      "goods_count": "233",\n      "goods_image": "https://omsproductionimg.yangkeduo.com/images/2017-12-12/bcf848aa71c6389607ae7a84b70f1543.jpeg",\n      "goods_name": "\\u30102\\u4ef6\\u5957\\u3011\\u5957\\u88c5\\u79cb\\u51ac\\u65b0\\u6b3e\\u4eff\\u736d\\u5154\\u6bdb\\u9489\\u73e0\\u76ae\\u8349\\u6bdb\\u6bdb\\u77ed\\u5916\\u5957\\u52a0\\u539a\\u5927\\u8863\\u5973\\u88c5",\n      "original_price": "",\n      "unit_price": "\\uffe599.00"\n    },\n    {\n      "goodsId": "33809635011",\n      "goods_count": "521",\n      "goods_image": "https://omsproductionimg.yangkeduo.com/images/2017-12-12/176019babfdecffa1d9f98f40b7e99b4.jpeg",\n      "goods_name": "\\u597d\\u5947\\u5c0f\\u68ee\\u6797\\u5fc3\\u94bb\\u88c5\\u7eb8\\u5c3f\\u88e4M22\\u62c9\\u62c9\\u88e4L18/XL14\\u8d85\\u8584\\u900f\\u6c14\\u88e4\\u578b\\u5c3f\\u4e0d\\u6e7f 1\\u4ef6\\u88c5",\n      "original_price": "",\n      "unit_price": "\\uffe5108.00"\n    },\n    {\n      "goodsId": "56996760797",\n      "goods_count": "1181",\n      "goods_image": "https://omsproductionimg.yangkeduo.com/images/2017-12-12/efb5db42397550bffd3211ca6f197498.jpeg",\n      "goods_name": "\\u51bb\\u5e72\\u9e21\\u5c0f\\u80f8\\u6574\\u5757\\u589e\\u80a5\\u8425\\u517b\\u53d1\\u816e\\u72d7\\u72d7\\u96f6\\u98df\\u65b0\\u624b\\u517b\\u732b\\u96f6\\u98df\\u5e7c\\u732b\\u96f6\\u98df100g",\n      "original_price": "",\n      "unit_price": "\\uffe517.80"\n    },\n    {\n      "goodsId": "82193785267",\n      "goods_count": "3000+",\n      "goods_image": "https://omsproductionimg.yangkeduo.com/images/2017-12-12/efb5db42397550bffd3211ca6f197498.jpeg",\n      "goods_name": "\\u3010\\u81ea\\u8425\\u3011ISB\\u4f0a\\u73ca\\u5a1c\\u610f\\u5927\\u5229\\u6c34\\u679c\\u7cfb\\u5217\\u5ba0\\u7269\\u72ac\\u732b\\u6c90\\u6d74\\u9732\\u9664\\u81ed\\u9999\\u6ce2\\u62a4\\u6bdb\\u7d20",\n      "original_price": "",\n      "unit_price": "\\uffe5650.00"\n    },\n    {\n      "goodsId": "74190550836",\n      "goods_count": "1000+",\n      "goods_image": "https://omsproductionimg.yangkeduo.com/images/2017-12-12/efb5db42397550bffd3211ca6f197498.jpeg",\n      "goods_name": "\\u3010\\u65b0\\u54c1\\u96f60CM\\u5d4c\\u5165\\u5f0f\\u3011\\u6d77\\u5c14\\u7535\\u51b0\\u7bb1410L\\u5bb6\\u7528\\u6cd5\\u5f0f\\u56db\\u95e8\\u591a\\u95e8\\u5b98\\u65b9\\u6b63\\u54c1",\n      "original_price": "",\n      "unit_price": "\\uffe55746.00"\n    }\n  ],\n  "reason": "",\n  "request_id": "request_id",\n  "secache": "c98b29872e8a4b28859db207944ba817",\n  "secache_date": "2026-04-23 11:38:05",\n  "secache_time": 1776915485000,\n  "translate_language": "zh-CN"\n}\n\nINFO     common.recordlog:apiutil.py:183 json提取到参数：{\'goodsId\': [\'18382788819\', \'33809635011\', \'56996760797\', \'82193785267\', \'74190550836\']}\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'contains\': {\'error_code\': \'0000\'}}]\nINFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【0000】,实际结果【0000】\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.018962525000000063, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.562233, 'title': 'testcase/ProductManager/test_productList.py::TestLogin::test_get_product_detail[base_info0-testcase0]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：商品详情\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/coupApply/cms/productDetail\nINFO     common.recordlog:sendrequest.py:137 请求方式：post\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：获取商品详情\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/json;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:147 请求参数：{\'json\': {\'pro_id\': \'18382788819,33809635011,56996760797,82193785267,74190550836\', \'page\': 1, \'size\': 20}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "error": "\\u4e0d\\u5b58\\u5728\\u8be5\\u5546\\u54c1",\n  "error_code": "4000",\n  "goodsId": "",\n  "item": {},\n  "secache_date": "2026-04-24 20:36:39",\n  "translate_language": "zh-CN"\n}\n\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'contains\': {\'error_code\': \'4000\'}}]\nINFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【4000】,实际结果【4000】\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.017877259000000034, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.5924869, 'title': 'testcase/ProductManager/test_productList.py::TestLogin::test_commit_order[base_info0-testcase0]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：提交订单\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/coupApply/cms/placeAnOrder\nINFO     common.recordlog:sendrequest.py:137 请求方式：post\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：提交订单\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/json;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:147 请求参数：{\'json\': {\'goods_id\': \'33809635011\', \'number\': 2, \'propertyChildIds\': \'2:9\', \'inviter_id\': \'127839112\', \'price\': \'128\', \'freight_insurance\': \'0.0\', \'discount_code\': \'002399\', \'consignee_info\': {\'name\': \'张三\', \'phone\': 13800000000, \'address\': \'北京市海淀区西三环北路74号院4栋3单元1008\'}}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "crateTime": "2026-04-24 20:36:39",\n  "error": "",\n  "error_code": "0000",\n  "message": "\\u63d0\\u4ea4\\u8ba2\\u5355\\u6210\\u529f",\n  "orderNumber": "125672935229594421088",\n  "translate_language": "zh-CN",\n  "userId": "9841004521408302057"\n}\n\nINFO     common.recordlog:apiutil.py:154 提取接口的返回值：\nINFO     common.recordlog:apiutil.py:154 提取接口的返回值：\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'eq\': {\'message\': \'提交订单成功\'}}, {\'eq\': {\'error_code\': \'0000\'}}]\nINFO     common.recordlog:assertions.py:68 相等断言成功：接口实际结果：{\'message\': \'提交订单成功\'}，等于预期结果：{\'message\': \'提交订单成功\'}\nINFO     common.recordlog:assertions.py:68 相等断言成功：接口实际结果：{\'error_code\': \'0000\'}，等于预期结果：{\'error_code\': \'0000\'}\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.01609451999999978, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.6366122, 'title': 'testcase/ProductManager/test_productList.py::TestLogin::test_order_pay[base_info0-testcase0]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：订单支付\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/coupApply/cms/orderPay\nINFO     common.recordlog:sendrequest.py:137 请求方式：post\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：订单支付\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/json;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:147 请求参数：{\'json\': {\'orderNumber\': \'125672935229594421088\', \'userId\': \'9841004521408302057\', \'timeStamp\': \'1777034199\'}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "createTime": "2026-04-24 20:36:39",\n  "error": "",\n  "error_code": "0000",\n  "message": "\\u8ba2\\u5355\\u652f\\u4ed8\\u6210\\u529f",\n  "translate_language": "zh-CN"\n}\n\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'contains\': {\'message\': \'订单支付成功\'}}, {\'contains\': {\'error_code\': \'0000\'}}]\nINFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【订单支付成功】,实际结果【订单支付成功】\nINFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【0000】,实际结果【0000】\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.030336487000000023, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.6719658, 'title': 'testcase/Single interface/test_debug_api.py::TestUserManager::test_add_user[base_info0-testcase0]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：新增用户\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/dar/user/addUser\nINFO     common.recordlog:sendrequest.py:137 请求方式：POST\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：正常新增用户\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/x-www-form-urlencoded;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:144 请求参数：{\'data\': {\'username\': \'testadduser\', \'password\': \'tset6789890\', \'role_id\': 123456789, \'dates\': \'2023-12-31\', \'phone\': 13800000000, \'token\': \'49BbCD1EA59DF4Ac726F3FeFa3Fcf\'}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "error_code": null,\n  "msg": "\\u65b0\\u589e\\u6210\\u529f",\n  "msg_code": 200\n}\n\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'contains\': {\'status_code\': 200}}, {\'contains\': {\'msg\': \'新增成功\'}}]\nINFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【新增成功】,实际结果【新增成功】\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.019989854000000307, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.698674, 'title': 'testcase/Single interface/test_debug_api.py::TestUserManager::test_add_user[base_info1-testcase1]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：新增用户\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/dar/user/addUser\nINFO     common.recordlog:sendrequest.py:137 请求方式：POST\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：无效新增·缺少token\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/x-www-form-urlencoded;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:144 请求参数：{\'data\': {\'username\': \'testadduser\', \'password\': \'tset6789890\', \'role_id\': 123456789, \'dates\': \'2023-12-31\', \'phone\': 13800000000, \'token\': None}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "msg": "\\u65b0\\u589e\\u5931\\u8d25",\n  "msg_code": 9001\n}\n\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'contains\': {\'status_code\': 200}}, {\'contains\': {\'msg\': \'新增失败\'}}]\nINFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【新增失败】,实际结果【新增失败】\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.013931894999999805, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.726712, 'title': 'testcase/Single interface/test_debug_api.py::TestUserManager::test_add_user[base_info2-testcase2]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：新增用户\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/dar/user/addUser\nINFO     common.recordlog:sendrequest.py:137 请求方式：POST\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：无效新增·缺少必填参数username\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/x-www-form-urlencoded;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:144 请求参数：{\'data\': {\'password\': \'tset6789890\', \'role_id\': 123456789, \'dates\': \'2023-12-31\', \'phone\': 13800000000, \'token\': None}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "msg": "\\u65b0\\u589e\\u5931\\u8d25",\n  "msg_code": 9001\n}\n\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'contains\': {\'status_code\': 200}}, {\'contains\': {\'msg\': \'新增失败\'}}]\nINFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【新增失败】,实际结果【新增失败】\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.013120572000000053, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.756633, 'title': 'testcase/Single interface/test_debug_api.py::TestUserManager::test_add_user[base_info3-testcase3]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：新增用户\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/dar/user/addUser\nINFO     common.recordlog:sendrequest.py:137 请求方式：POST\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：无效新增·缺少必填参数role_id\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/x-www-form-urlencoded;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:144 请求参数：{\'data\': {\'username\': \'testadduser\', \'password\': \'tset6789890\', \'dates\': \'2023-12-31\', \'phone\': 13800000000, \'token\': None}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "msg": "\\u65b0\\u589e\\u5931\\u8d25",\n  "msg_code": 9001\n}\n\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'contains\': {\'status_code\': 200}}, {\'contains\': {\'msg\': \'新增失败\'}}]\nINFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【新增失败】,实际结果【新增失败】\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.015505532999999794, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.779071, 'title': 'testcase/Single interface/test_debug_api.py::TestUserManager::test_update_user[base_info0-testcase0]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：修改用户\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/dar/user/updateUser\nINFO     common.recordlog:sendrequest.py:137 请求方式：POST\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：正常修改用户信息\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/x-www-form-urlencoded;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:144 请求参数：{\'data\': {\'username\': \'testadduser\', \'password\': \'tset6789#$123\', \'role_id\': 89588181111112343, \'dates\': \'2023-12-31\', \'phone\': 13800000000}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "error_code": null,\n  "msg": "\\u66f4\\u65b0\\u6210\\u529f",\n  "msg_code": 200\n}\n\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'contains\': {\'status_code\': 200}}, {\'contains\': {\'msg\': \'更新成功\'}}]\nINFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【更新成功】,实际结果【更新成功】\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.008620832000000078, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.802006, 'title': 'testcase/Single interface/test_debug_api.py::TestUserManager::test_delete_user[base_info0-testcase0]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：删除用户\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/dar/user/deleteUser\nINFO     common.recordlog:sendrequest.py:137 请求方式：POST\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：有效删除用户\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/x-www-form-urlencoded;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:144 请求参数：{\'data\': {\'user_id\': 123839387391912}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "error_code": null,\n  "msg": "\\u5220\\u9664\\u6210\\u529f!",\n  "msg_code": 200\n}\n\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'contains\': {\'msg\': \'删除成功\'}}]\nINFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【删除成功】,实际结果【删除成功!】\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.00941768899999973, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.825564, 'title': 'testcase/Single interface/test_debug_api.py::TestUserManager::test_delete_user[base_info1-testcase1]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：删除用户\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/dar/user/deleteUser\nINFO     common.recordlog:sendrequest.py:137 请求方式：POST\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：无效删除用户·userid不存在\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/x-www-form-urlencoded;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:144 请求参数：{\'data\': {\'user_id\': 1238393873922}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "msg": "\\u5220\\u9664\\u5931\\u8d25\\uff0c\\u7528\\u6237id\\u4e0d\\u5b58\\u5728!",\n  "msg_code": 9001\n}\n\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'contains\': {\'msg\': \'删除失败\'}}]\nINFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【删除失败】,实际结果【删除失败，用户id不存在!】\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.007763188999999837, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.845763, 'title': 'testcase/Single interface/test_debug_api.py::TestUserManager::test_delete_user[base_info2-testcase2]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：删除用户\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/dar/user/deleteUser\nINFO     common.recordlog:sendrequest.py:137 请求方式：POST\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：无效删除用户·userid为空\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/x-www-form-urlencoded;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:144 请求参数：{\'data\': {\'user_id\': 1238393873922}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "msg": "\\u5220\\u9664\\u5931\\u8d25\\uff0c\\u7528\\u6237id\\u4e0d\\u5b58\\u5728!",\n  "msg_code": 9001\n}\n\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'contains\': {\'msg\': \'删除失败\'}}]\nINFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【删除失败】,实际结果【删除失败，用户id不存在!】\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.007159347000000427, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.867455, 'title': 'testcase/Single interface/test_debug_api.py::TestUserManager::test_delete_user[base_info3-testcase3]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：删除用户\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/dar/user/deleteUser\nINFO     common.recordlog:sendrequest.py:137 请求方式：POST\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：无效删除用户·缺少必填参数\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/x-www-form-urlencoded;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "msg": "\\u5220\\u9664\\u5931\\u8d25\\uff0c\\u7528\\u6237id\\u4e0d\\u5b58\\u5728!",\n  "msg_code": 9001\n}\n\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'contains\': {\'msg\': \'删除失败\'}}]\nINFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【删除失败】,实际结果【删除失败，用户id不存在!】\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.008694791000000368, 'doc': '', 'time': '2026-04-24 20:36:39'}, {'id': 1777034199.8913002, 'title': 'testcase/Single interface/test_debug_api.py::TestUserManager::test_query_user[base_info0-testcase0]', 'logs': 'Captured log setup\nINFO     common.recordlog:conftest.py:20 -------------接口测试开始--------------\nCaptured log call\nINFO     common.recordlog:sendrequest.py:135 接口名称：用户查询\nINFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/dar/user/queryUser\nINFO     common.recordlog:sendrequest.py:137 请求方式：POST\nINFO     common.recordlog:sendrequest.py:138 测试用例名称：有效查询用户\nINFO     common.recordlog:sendrequest.py:139 请求头：{\'Content-Type\': \'application/x-www-form-urlencoded;charset=UTF-8\'}\nINFO     common.recordlog:sendrequest.py:140 Cookie：None\nINFO     common.recordlog:sendrequest.py:144 请求参数：{\'data\': {\'user_id\': 123839387391912}}\nINFO     common.recordlog:sendrequest.py:108 接口返回信息：{\n  "error_code": null,\n  "msg": "\\u67e5\\u8be2\\u6210\\u529f!",\n  "msg_code": 200\n}\n\nINFO     common.recordlog:assertions.py:170 yaml文件预期结果：[{\'contains\': {\'msg\': \'查询成功\'}}, {\'eq\': {\'msg_code\': 200}}]\nINFO     common.recordlog:assertions.py:45 字符串包含断言成功：预期结果【查询成功】,实际结果【查询成功!】\nINFO     common.recordlog:assertions.py:68 相等断言成功：接口实际结果：{\'msg_code\': 200}，等于预期结果：{\'msg_code\': 200}\nINFO     common.recordlog:assertions.py:198 测试成功\n', 'result': 1, 'duration': 0.007961089000000143, 'doc': '', 'time': '2026-04-24 20:36:39'}],
+          logs:'',
+          summary: {'total': 19, 'success': 19, 'failed': 0, 'success_rate': 1.0, 'fail_rate': 0.0, 'duration': 0.2865302620000003, 'avg_duration': 0.015080540105263175},
+          expands: [],
+          getRowKeys (row) {
+            return row.id
+          },
+          currentPage: 1,
+            pageSize: 10
+        }
+      },
+      methods:{
+        count(index) {
+            return (this.currentPage - 1) * this.pageSize + index + 1
+        },
+        expend(row, expandedRows){
+            var that = this
+            if (expandedRows.length) {
+              that.expands = []
+              if (row) {
+                that.expands.push(row.id)
+              }
+            } else {
+              that.expands = []
+            }
+        },
+        filterTag(value, row) {
+          return row.result === value;
+        },
+        handleSizeChange(val) {
+            this.pageSize = val;
+          },
+        handleCurrentChange(val) {
+            this.currentPage=val;
+        },
+        fliterChange(filters){
+            const filterskey = filters.result;
+            console.log(filterskey)
+            if (filterskey.length>0) {
+              this.data = this.tableData.filter(data => {
+
+                  return data['result'] === filterskey[0] | data['result'] === filterskey[1];
+              });
+              this.currentPage = 1;
+              return this.data;
+            }
+            this.data = this.tableData;
+            this.currentPage = 1;
+            return this.data
+        },
+      },
+      mounted(){
+        this.data = this.tableData;
+      }
+    })
+  </script>
+
+  <script type="text/javascript">
+
+var chartDom = document.getElementById('main');
+var myChart = echarts.init(chartDom);
+var option;
+
+option = {
+    series: [{
+        type: 'gauge',
+        startAngle: 180,
+        endAngle: 0,
+        min: 0,
+        max: 1,
+        splitNumber: 8,
+        axisLine: {
+            lineStyle: {
+                width: 6,
+                color: [
+                    [0.25, '#FF6E76'],
+                    [0.5, '#FDDD60'],
+                    [0.75, 'darkslateblue'],
+                    [1, '#97cc64']
+                ]
+            }
+        },
+        pointer: {
+            icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z',
+            length: '12%',
+            width: 20,
+            offsetCenter: [0, '-60%'],
+            itemStyle: {
+                color: 'auto'
+            }
+        },
+        axisTick: {
+            length: 12,
+            lineStyle: {
+                color: 'auto',
+                width: 2
+            }
+        },
+        splitLine: {
+            length: 20,
+            lineStyle: {
+                color: 'auto',
+                width: 5
+            }
+        },
+        axisLabel: {
+            color: '#464646',
+            fontSize: 20,
+            distance: -60,
+            formatter: function (value) {
+                if (value === 0.875) {
+                    return '优';
+                }
+                else if (value === 0.625) {
+                    return '中';
+                }
+                else if (value === 0.375) {
+                    return '良';
+                }
+                else if (value === 0.125) {
+                    return '差';
+                }
+            }
+        },
+        title: {
+            offsetCenter: [0, '-20%'],
+            fontSize: 30
+        },
+        detail: {
+            fontSize: 30,
+            offsetCenter: [0, '30%'],
+            valueAnimation: true,
+            formatter: function (value) {
+                return Math.round(value * 100) + '%';
+            },
+            color: 'auto'
+        },
+        data: [{
+            value: 1.0,
+            name: '执行成功率'
+        }]
+    }]
+};
+
+option && myChart.setOption(option);
+
+</script>
+  <script type="text/javascript">
+    var chartDom = document.getElementById('main2');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+option = {
+    title: {
+        text: '用例执行情况',
+        subtext: '本次执行成功失败比例',
+        left: 'center'
+    },
+    tooltip: {
+        trigger: 'item'
+    },
+    legend: {
+        orient: 'vertical',
+        left: 'left',
+    },
+    series: [
+        {
+            name: '访问来源',
+            type: 'pie',
+            radius: '50%',
+            data: [{'value': 19, 'name': 'Success', 'itemStyle': {'color': '#97cc64'}}, {'value': 0, 'name': 'Failed', 'itemStyle': {'color': '#fd5a3e'}}],
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
+        }
+    ]
+};
+
+option && myChart.setOption(option);
+</script>
+
+<style>
+  .el-header, .el-footer {
+    background-color: darkslateblue;
+    text-align: center;
+    color: white;
+    /*line-height: 60px;*/
+  }
+
+  .el-col {
+    margin-right: 10px;
+  }
+
+  .el-card{
+    border-radius: 15px;
+  }
+
+  .el-table .cell {
+    white-space: pre-line;
+
+    }
+  /*.el-aside {*/
+  /*  background-color: #D3DCE6;*/
+  /*  color: #333;*/
+  /*  text-align: center;*/
+  /*  line-height: 400px;*/
+  /*}*/
+</style>
+</html>
