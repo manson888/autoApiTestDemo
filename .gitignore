@@ -12,3 +12,5 @@ gen
 !/data/vehicleNo.csv
 !/logs/
 !/testcase/
+!/使用前请阅读此文件.md
+!/venv/
