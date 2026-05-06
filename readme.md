@@ -15,5 +15,8 @@
 - run.py 主程序入口
 - dockerfile与jenkinsfile自由写 不上传
 
+
+- 需要用到mockserver的时候 单独运行 修改common/mockserver.py 目前这个文件只写了个支付回调的mock
+
 运行截图
 ![](./reportPng.png)
