@@ -14,3 +14,6 @@
 - requirements.txt 本框架所使用的到的第三方库
 - run.py 主程序入口
 - dockerfile与jenkinsfile自由写 不上传
+
+运行截图
+![](./reportPng.png)
