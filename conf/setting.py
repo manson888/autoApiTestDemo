@@ -19,6 +19,11 @@ SHEET_ID = 0
 REPORT_TYPE = 'allure'
 # REPORT_TYPE = 'tm'
 
+# 是否开启 xdist 分布式运行
+USE_XDIST = False
+# 分布式运行的并发进程数
+XDIST_WORKERS = 2
+
 # 是否发送钉钉消息
 dd_msg = False
 
