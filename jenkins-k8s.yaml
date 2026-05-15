@@ -1,0 +1,62 @@
+---
+# 1. 定义一个权限账号，让 Jenkins 有权操作 K8s 资源
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jenkins-admin
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: jenkins-admin-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin  # 学习阶段直接给最高权限
+subjects:
+- kind: ServiceAccount
+  name: jenkins-admin
+  namespace: default
+---
+# 2. 部署 Jenkins Pod
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jenkins-server
+  labels:
+    app: jenkins
+spec:
+  serviceAccountName: jenkins-admin
+  initContainers:
+  - name: fix-permissions
+    image: alpine:latest
+    command: [ "sh", "-c", "chown -R 1000:1000 /var/jenkins_home" ]
+    volumeMounts:
+      - name: jenkins-home
+        mountPath: /var/jenkins_home
+  containers:
+  - name: jenkins
+    image: jenkins/jenkins:lts-jdk17
+    securityContext:
+      runAsUser: 0
+    ports:
+    - containerPort: 8080
+    volumeMounts:
+    - name: jenkins-home
+      mountPath: /var/jenkins_home
+    - name: docker-sock
+      mountPath: /var/run/docker.sock # 关键：透传 Docker 给 Jenkins 使用
+    - name: project-code
+      mountPath: /app/my-project  # Jenkins 内部看代码的路径
+  volumes:
+  - name: jenkins-home
+    hostPath:
+      path: /Users/keroro/jenkins_home # 确保 Jenkins 重启数据不丢失
+      type: DirectoryOrCreate
+  - name: docker-sock
+    hostPath:
+      path: /var/run/docker.sock # 引用 Mac 本地的 Docker 守护进程
+  - name: project-code
+    hostPath:
+      path: /Users/mannson/Downloads/testDemo/pythonproject  # 你 Mac 上的代码位置
+      type: Directory

@@ -1,0 +1,67 @@
+pipeline {
+    agent any
+    tools {
+        allure 'allure'
+    }
+    stages {
+        stage('自动化工具检查与安装') {
+            steps {
+                script {
+                    // 检查并安装 Docker
+                    def dockerCheck = sh(script: 'which docker', returnStatus: true)
+                    if (dockerCheck != 0) {
+                        echo "正在自动安装 Docker 客户端..."
+                        sh 'curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-29.3.1.tgz | tar xzC /tmp && mv /tmp/docker/docker /usr/local/bin/ && rm -rf /tmp/docker'
+                    }
+
+                    // 检查并安装 kubectl (改用单引号避免 $ 冲突)
+                    def kubeCheck = sh(script: 'which kubectl', returnStatus: true)
+                    if (kubeCheck != 0) {
+                        echo "正在自动安装 kubectl..."
+                        sh 'curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && chmod +x kubectl && mv kubectl /usr/local/bin/'
+                    }
+                }
+                sh 'docker --version'
+                sh 'kubectl get nodes'
+            }
+        }
+
+        stage('构建并部署') {
+            steps {
+                dir('/app/my-project') {
+                    sh 'docker build -t real-pytest-project:v1 .'
+                    sh 'kubectl delete job pytest-automation-job || true'
+                    sh 'kubectl apply -f pytest-job.yaml'
+                }
+            }
+        }
+
+        stage('监控测试状态') {
+            steps {
+                echo "等待测试运行..."
+                sleep 20
+                sh 'kubectl logs -f job/pytest-automation-job'
+            }
+        }
+    }
+
+        post {
+        always {
+            script {
+                // 1. 在 Jenkins 工作区创建一个临时目录
+                sh "mkdir -p allure-results"
+
+                // 2. 将挂载目录下的 json 拷贝到工作区（避免插件识别绝对路径的问题）
+                sh "cp -r /app/my-project/report/temp/. allure-results/"
+
+                // 3. 打印一下确认拷贝成功
+                sh "ls -l allure-results"
+
+                // 4. 使用相对路径生成报告
+                allure includeProperties: false,
+                       jdk: 'allure',
+                       results: [[path: 'allure-results']]
+            }
+        }
+    }
+}

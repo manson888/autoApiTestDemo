@@ -13,7 +13,7 @@
 - pytest.ini pytest框架规范约束，名称是固定写法不可更改
 - requirements.txt 本框架所使用的到的第三方库
 - run.py 主程序入口
-- dockerfile与jenkinsfile自由写 不上传
+- dockerfile与jenkinsfile自由写 jenkins yaml 与 job yaml 下面都是我自己本地跑的 一定要注意 不能乱用 拿去使用的时候要注意权限 尤其生产环境 不能这么给权限 本地运行 不用k8s环境的时候 可以直接删掉这三个文件就行
 
 - 需要用到mockserver的时候 单独运行 修改common/mockserver.py 目前这个文件只写了个支付回调的mock
 

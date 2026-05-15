@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pytest-automation-job  # Job 的名字
+spec:
+  template:
+    spec:
+      containers:
+      - name: pytest-container
+        image: real-pytest-project:v1  # 刚才 build 成功的镜像名
+        imagePullPolicy: Never        # 关键：告诉 K8s 只用本地镜像，不要去网上拉
+        env:
+        - name: PYTHONPATH            # 解决之前报错的导包问题
+          value: "/app"
+        volumeMounts:                 # 容器内的挂载点
+        - name: report-storage
+          mountPath: /app/report
+      restartPolicy: Never            # 任务失败也不自动重启（测试通常不需要重启）
+      volumes:
+      - name: report-storage
+        hostPath:
+          # 例如：/Users/yourname/Downloads/testDemo/pythonproject/report
+          path: /Users/mannson/Downloads/testDemo/pythonproject/report
+          type: Directory
+  backoffLimit: 0                     # 失败尝试次数：0 表示失败了就直接停，不重试
