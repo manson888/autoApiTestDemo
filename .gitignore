@@ -14,6 +14,11 @@ gen
 /report/
 *.log
 
+# 测试用例目录 (只上传 BannerManager 和全局配置 conftest.py)
+/testcase/*
+!/testcase/BannerManager/
+!/testcase/conftest.py
+
 # --- 敏感隐私文件配置 (核心保护区) ---
 # 1. 真实多端环境及数据库配置
 /conf/config.ini
