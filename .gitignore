@@ -9,6 +9,11 @@ gen
 /venv/
 /.venv/
 
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
 # Logs and Reports
 /logs/
 /report/
