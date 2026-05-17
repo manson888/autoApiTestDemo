@@ -1,16 +1,30 @@
-### Example user template template
-### Example user template
-
 # IntelliJ project files
 .idea
 *.iml
 out
 gen
-!/common/tlgRobot.py
-!/conf/config.ini
-!/data/loginDev.yaml
-!/data/vehicleNo.csv
-!/logs/
-!/testcase/
-!/ʹ��ǰ���Ķ����ļ�.md
-!/venv/
+.DS_Store
+
+# Virtual environment
+/venv/
+/.venv/
+
+# Logs and Reports
+/logs/
+/report/
+*.log
+
+# --- 敏感隐私文件配置 (核心保护区) ---
+# 1. 真实多端环境及数据库配置
+/conf/config.ini
+
+# 2. 真实测试账号池
+/data/accounts.yaml
+
+# 3. 登录Token及动态提取缓存
+/extract.yaml
+/data/loginDev.yaml
+/data/loginName.yaml
+
+# 4. 其他敏感数据
+/data/vehicleNo.csv
