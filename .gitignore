@@ -28,3 +28,4 @@ gen
 
 # 4. 其他敏感数据
 /data/vehicleNo.csv
+/nots.md
