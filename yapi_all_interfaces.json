@@ -1,0 +1,22 @@
+[
+  {
+    "name": "用户管理",
+    "list": [
+      {
+        "path": "/biz/user/info",
+        "method": "GET",
+        "title": "获取用户信息"
+      }
+    ]
+  },
+  {
+    "name": "订单中心",
+    "list": [
+      {
+        "path": "/biz/order/create",
+        "method": "POST",
+        "title": "创建商品订单"
+      }
+    ]
+  }
+]

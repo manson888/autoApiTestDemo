@@ -1,0 +1,23 @@
+# 多环境多站点账号配置模板
+# 使用前请复制此文件并重命名为 accounts.yaml，填入真实账号
+dev:
+  user:
+    username: "your_dev_user"
+    password: "your_password"
+  admin:
+    username: "your_dev_admin"
+    password: "your_password"
+  partner:
+    username: "your_dev_partner"
+    password: "your_password"
+    
+prod:
+  user:
+    username: "your_prod_user"
+    password: "your_password"
+  admin:
+    username: "your_prod_admin"
+    password: "your_password"
+  partner:
+    username: "your_prod_partner"
+    password: "your_password"

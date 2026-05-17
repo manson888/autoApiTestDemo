@@ -1,0 +1,20 @@
+- baseInfo:
+    system: user
+    api_name: 提交存款
+    url: /kk/promen/cashin/submit
+    method: Post
+    header:
+      Accept-Encoding: gzip, deflate, br, zstd
+      pmtoken: ${get_extract_data(user_token)}
+      device: '1'
+  testCase:
+    - case_name: 确认提交
+      data:
+        orderId: ${get_extract_data(cardOrderId)}
+      validation:
+        - contains: { 'msg': '提交成功' }
+    - case_name: 提交错误信息
+      data:
+        orderId: '112233'
+      validation:
+        - contains: { 'msg': '失败' }

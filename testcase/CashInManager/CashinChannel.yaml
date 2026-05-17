@@ -1,0 +1,19 @@
+- baseInfo:
+    system: user
+    api_name: 卡转卡
+    url: /kk/promen/cashin/card/pre
+    method: Post
+    header:
+      Content-Type: application/x-www-form-urlencoded;charset=UTF-8
+      pmtoken: ${get_extract_data(user_token)}
+      device: '1'
+  testCase:
+    - case_name: 发起卡转卡存款
+      data:
+        channelCode: card
+        realName: 'testname'
+        amt: 111
+      validation:
+        - contains: { 'msg': '操作成功' }
+      extract:
+        cardOrderId: $.data.orderId

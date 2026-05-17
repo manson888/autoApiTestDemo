@@ -1,6 +1,6 @@
 Cookie:
-  pmToken: 42c9276d41c94f0cb0f5ec2ffed782aa
-pmtoken: 42c9276d41c94f0cb0f5ec2ffed782aa
+  pmToken: b909ace95ee346c5af30109a5c562d5d
+user_token: b909ace95ee346c5af30109a5c562d5d
 cashinChannelList:
 - card
 - unionpay
@@ -23,4 +23,4 @@ cashinChannelList:
 - bobi
 - u234
 - vip
-cardOrderId: '2051921159947026455'
+cardOrderId: '2056030637558595674'

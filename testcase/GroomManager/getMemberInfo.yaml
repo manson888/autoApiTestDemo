@@ -1,0 +1,13 @@
+- baseInfo:
+    system: user
+    api_name: 个人信息
+    url: /kk/promen/member/info
+    method: Get
+    header:
+      Content-Type: application/x-www-form-urlencoded;charset=UTF-8
+      pmtoken: ${get_extract_data(user_token)}
+      device: '1'
+  testCase:
+    - case_name: 获取个人信息
+      validation:
+        - contains: { 'msg': '查询成功' }

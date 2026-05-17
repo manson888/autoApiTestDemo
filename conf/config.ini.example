@@ -1,0 +1,73 @@
+[api_envi]
+host = http://127.0.0.1:8787
+
+[dev_user]
+host = https://xxx
+[dev_admin]
+host = xxx
+[dev_partner]
+host = xxx
+
+[prod_user]
+host = xxx
+[prod_admin]
+host = xxx
+[prod_partner]
+host = xxx
+
+
+[MYSQL]
+host = 127.0.0.1
+port = 3306
+username = root
+password = your_mysql_password
+database = zqsjfx
+
+[REDIS]
+host = 127.0.0.1
+port = 7005
+username = ""
+password = "your_redis_password"
+db = db0
+
+[CLICKHOUSE]
+host = 127.0.0.1
+port = 8123
+username = default
+password = your_clickhouse_password
+timeout = 10
+db = default
+
+[MongoDB]
+host = 127.0.0.1
+port = 27017
+username = admin
+password = your_mongo_password
+database = admin
+
+[EMAIL]
+host = smtp.163.com
+port = 25
+user = 发件人邮箱地址
+passwd = *****这里填邮箱的授权码，不是邮箱登录密码*****
+addressee = 收件邮箱地址，多个收件人以;隔开，但是这里不用这个邮件发送，使用的是jenkins自带的邮件发送功能
+subject = 接口测试
+
+[SSH]
+host = ******
+port = 22
+username = root
+password = *******
+timeout = 10
+command = cat /logs/web_app/zjjtsjzf/zjjtsjzf-api/common-default.log
+
+;默认为allure，则生成allure报告，若=tm，则生成tmreport报告
+[REPORT_TYPE]
+type = allure
+
+[JENKINS]
+url = *****
+username = admin
+password = *****
+timeout = 10
+job_name = *****

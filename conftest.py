@@ -14,6 +14,20 @@ from conf.setting import dd_msg, tl_msg
 import warnings
 
 yfd = ReadYamlData()
+import os
+
+def pytest_addoption(parser):
+    """添加命令行参数"""
+    parser.addoption(
+        "--env", action="store", default="dev", help="运行环境：dev(测试服) 或 prod(线上服)"
+    )
+
+@pytest.fixture(scope="session", autouse=True)
+def set_env(request):
+    """获取环境变量并写入系统变量中，供全局读取"""
+    env = request.config.getoption("--env")
+    os.environ["TEST_ENV"] = env  # 存入 os 环境变量
+
 
 
 @pytest.fixture(scope="session", autouse=True)

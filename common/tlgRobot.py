@@ -5,8 +5,8 @@ def send_telegram_message(content_str):
     """
     发送消息推送
     """
-    token = 'xxx'
-    chat_id = 'xxx'
+    token = '8713279768:AAHYQxK3J9Vm14aY45AIW3X5AP-pcTj2G2o'
+    chat_id = '-5266361078'
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     payload = {
         "chat_id": chat_id,

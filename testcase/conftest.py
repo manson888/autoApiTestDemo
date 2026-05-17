@@ -1,10 +1,13 @@
+import os
+import yaml
 import pytest
 import allure
-from common.readyaml import get_testcase_yaml
+from common.readyaml import get_testcase_yaml, ReadYamlData
 from base.apiutil import RequestBase
 from common.recordlog import logs
-from common.readyaml import ReadYamlData
 from common.connection import ConnectMysql
+from conf.operationConfig import OperationConfig
+from common.sendrequest import SendRequest
 
 """
 -function：每一个函数或方法都会调用
@@ -24,14 +27,63 @@ def start_test_and_end():
 
 
 @pytest.fixture(scope='session', autouse=True)
-@allure.story("登录")
-def system_login():
+@allure.story("全局多端登录初始化")
+def global_auto_login():
     try:
-        # api_info = get_testcase_yaml('./data/loginName.yaml')
-        api_info = get_testcase_yaml('./data/loginDev.yaml')
-        RequestBase().specification_yaml(api_info[0][0], api_info[0][1])
+        env = os.environ.get("TEST_ENV", "dev")
+        with open('./data/accounts.yaml', 'r', encoding='utf-8') as f:
+            accounts = yaml.safe_load(f).get(env)
+        
+        if not accounts:
+            pytest.fail(f"未找到环境 {env} 的账号配置！")
+            
+        req_base = RequestBase()
+        accounts = req_base.replace_load(accounts)
+        
+        conf = OperationConfig()
+        req = SendRequest()
+        yfd = ReadYamlData()
+        
+        # ======== 1. 用户端登录 ========
+        user_host = conf.get_section_for_data(f"{env}_user", "host")
+        user_acc = accounts.get("user")
+        if user_acc:
+            res_user = req.run_main("用户端登录", f"{user_host}/kk/promen/member/login", "用户登录",
+                                    header={"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+                                            "Device": "1", "Lang": "zh",
+                                            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"},
+                                    method="Post",
+                                    data={"memberAccount": user_acc["username"], "loginPwd": user_acc["password"]})
+            if res_user and res_user.status_code == 200:
+                token = res_user.json().get("data", {}).get("token")
+                yfd.write_yaml_data({"user_token": token})
+
+        # ======== 2. 客服端登录 (暂时注释，等写好了再放开) ========
+        # admin_host = conf.get_section_for_data(f"{env}_admin", "host")
+        # admin_acc = accounts.get("admin")
+        # if admin_acc:
+        #     res_admin = req.run_main("客服端登录", f"{admin_host}/api/admin/login", "客服登录",
+        #                              header={"Content-Type": "application/json"},
+        #                              method="Post",
+        #                              json={"username": admin_acc["username"], "password": admin_acc["password"]})
+        #     if res_admin and res_admin.status_code == 200:
+        #         token = res_admin.json().get("data", {}).get("token")
+        #         yfd.write_yaml_data({"admin_token": token})
+            
+        # ======== 3. 商户端登录 (暂时注释，等写好了再放开) ========
+        # partner_host = conf.get_section_for_data(f"{env}_partner", "host")
+        # partner_acc = accounts.get("partner")
+        # if partner_acc:
+        #     res_partner = req.run_main("商户端登录", f"{partner_host}/api/partner/login", "商户登录",
+        #                                header={"Content-Type": "application/json"},
+        #                                method="Post",
+        #                                json={"username": partner_acc["username"], "password": partner_acc["password"]})
+        #     if res_partner and res_partner.status_code == 200:
+        #         token = res_partner.json().get("data", {}).get("token")
+        #         yfd.write_yaml_data({"partner_token": token})
+
     except Exception as e:
-        logs.error(f'登录接口出现异常，导致后续接口无法继续运行，请检查程序！，{e}')
+        logs.error(f'全局多端登录出现异常，导致后续接口无法运行！{e}')
         exit()
 
 

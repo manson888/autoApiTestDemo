@@ -1,0 +1,119 @@
+ERROR - 2026-04-27 22:19:15,016 - readyaml.py:28 -[readyaml:get_testcase_yaml] - [./testcase/ProductManager/getGroomList.yaml]文件未找到，请检查路径是否正确
+INFO - 2026-04-27 22:20:19,450 - sendrequest.py:139 -[sendrequest:run_main] - 接口名称：用户登录
+INFO - 2026-04-27 22:20:19,450 - sendrequest.py:140 -[sendrequest:run_main] - 请求地址：https://ua.k5615.com/kk/promen/member/login
+INFO - 2026-04-27 22:20:19,451 - sendrequest.py:141 -[sendrequest:run_main] - 请求方式：post
+INFO - 2026-04-27 22:20:19,451 - sendrequest.py:142 -[sendrequest:run_main] - 测试用例名称：用户名和密码正确登录验证
+INFO - 2026-04-27 22:20:19,451 - sendrequest.py:143 -[sendrequest:run_main] - 请求头：{'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'Device': 1, 'Lang': 'zh', 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36'}
+INFO - 2026-04-27 22:20:19,451 - sendrequest.py:144 -[sendrequest:run_main] - Cookie：None
+INFO - 2026-04-27 22:20:19,451 - sendrequest.py:148 -[sendrequest:run_main] - 请求参数：{'data': {'memberAccount': 'manson001', 'loginPwd': '10d66ccecdf01ccfff2b86cfb1fd2b76'}}
+ERROR - 2026-04-27 22:20:19,453 - sendrequest.py:119 -[sendrequest:send_request] - Header part (1) from ('Device', 1) must be of type str or bytes, not <class 'int'>
+INFO - 2026-04-27 22:22:22,010 - sendrequest.py:139 -[sendrequest:run_main] - 接口名称：用户登录
+INFO - 2026-04-27 22:22:22,010 - sendrequest.py:140 -[sendrequest:run_main] - 请求地址：https://ua.k5615.com/kk/promen/member/login
+INFO - 2026-04-27 22:22:22,011 - sendrequest.py:141 -[sendrequest:run_main] - 请求方式：post
+INFO - 2026-04-27 22:22:22,011 - sendrequest.py:142 -[sendrequest:run_main] - 测试用例名称：用户名和密码正确登录验证
+INFO - 2026-04-27 22:22:22,011 - sendrequest.py:143 -[sendrequest:run_main] - 请求头：{'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'Device': '1', 'Lang': 'zh', 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36'}
+INFO - 2026-04-27 22:22:22,011 - sendrequest.py:144 -[sendrequest:run_main] - Cookie：None
+INFO - 2026-04-27 22:22:22,011 - sendrequest.py:148 -[sendrequest:run_main] - 请求参数：{'data': {'memberAccount': 'manson001', 'loginPwd': '10d66ccecdf01ccfff2b86cfb1fd2b76'}}
+INFO - 2026-04-27 22:22:25,497 - sendrequest.py:111 -[sendrequest:send_request] - cookie：{'Cookie': {'pmToken': '6fc37c4d6c1d48888de03784f4df0e42'}}
+INFO - 2026-04-27 22:22:25,497 - sendrequest.py:112 -[sendrequest:send_request] - 接口返回信息：{"code":0,"msg":"in消息_登录成功","data":{"memberId":"1586924314353995831","memberAccount":"manson001","balance":0.00,"tokenName":"pmToken","token":"6fc37c4d6c1d48888de03784f4df0e42"}}
+ERROR - 2026-04-27 22:22:25,499 - apiutil.py:161 -[apiutil:extract_data] - 'bool' object is not subscriptable
+INFO - 2026-04-27 22:22:25,499 - assertions.py:170 -[assertions:assert_result] - yaml文件预期结果：[{'contains': {'error_code': 'none'}}, {'eq': {'msg': '登录成功'}}]
+ERROR - 2026-04-27 22:22:25,499 - assertions.py:194 -[assertions:assert_result] - 接口断言异常，请检查yaml预期结果值是否正确填写!
+ERROR - 2026-04-27 22:22:25,500 - apiutil.py:117 -[apiutil:specification_yaml] - 'bool' object is not subscriptable
+ERROR - 2026-04-27 22:22:25,500 - conftest.py:34 -[conftest:system_login] - 登录接口出现异常，导致后续接口无法继续运行，请检查程序！，'bool' object is not subscriptable
+INFO - 2026-04-27 22:24:14,131 - sendrequest.py:139 -[sendrequest:run_main] - 接口名称：用户登录
+INFO - 2026-04-27 22:24:14,131 - sendrequest.py:140 -[sendrequest:run_main] - 请求地址：https://ua.k5615.com/kk/promen/member/login
+INFO - 2026-04-27 22:24:14,132 - sendrequest.py:141 -[sendrequest:run_main] - 请求方式：post
+INFO - 2026-04-27 22:24:14,132 - sendrequest.py:142 -[sendrequest:run_main] - 测试用例名称：用户名和密码正确登录验证
+INFO - 2026-04-27 22:24:14,132 - sendrequest.py:143 -[sendrequest:run_main] - 请求头：{'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'Device': '1', 'Lang': 'zh', 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36'}
+INFO - 2026-04-27 22:24:14,132 - sendrequest.py:144 -[sendrequest:run_main] - Cookie：None
+INFO - 2026-04-27 22:24:14,132 - sendrequest.py:148 -[sendrequest:run_main] - 请求参数：{'data': {'memberAccount': 'manson001', 'loginPwd': '10d66ccecdf01ccfff2b86cfb1fd2b76'}}
+INFO - 2026-04-27 22:24:16,066 - sendrequest.py:111 -[sendrequest:send_request] - cookie：{'Cookie': {'pmToken': 'a7f8cffd225a4a58a8bd03639599386d'}}
+INFO - 2026-04-27 22:24:16,067 - sendrequest.py:112 -[sendrequest:send_request] - 接口返回信息：{"code":0,"msg":"in消息_登录成功","data":{"memberId":"1586924314353995831","memberAccount":"manson001","balance":0.00,"tokenName":"pmToken","token":"a7f8cffd225a4a58a8bd03639599386d"}}
+ERROR - 2026-04-27 22:24:16,068 - apiutil.py:161 -[apiutil:extract_data] - 'bool' object is not subscriptable
+INFO - 2026-04-27 22:24:16,068 - assertions.py:170 -[assertions:assert_result] - yaml文件预期结果：[{'contains': {'msg': '登录成功'}}]
+INFO - 2026-04-27 22:24:16,069 - assertions.py:45 -[assertions:contains_assert] - 字符串包含断言成功：预期结果【登录成功】,实际结果【in消息_登录成功】
+INFO - 2026-04-27 22:24:16,069 - assertions.py:198 -[assertions:assert_result] - 测试成功
+INFO - 2026-04-27 22:24:16,069 - conftest.py:21 -[conftest:start_test_and_end] - -------------接口测试开始--------------
+ERROR - 2026-04-27 22:24:16,075 - readyaml.py:113 -[readyaml:get_extract_yaml] - 【extract.yaml】没有找到：pmtoken,--'pmtoken'
+ERROR - 2026-04-27 22:24:16,076 - readyaml.py:113 -[readyaml:get_extract_yaml] - 【extract.yaml】没有找到：pmtoken,--'pmtoken'
+INFO - 2026-04-27 22:24:16,076 - sendrequest.py:139 -[sendrequest:run_main] - 接口名称：场馆列表
+INFO - 2026-04-27 22:24:16,077 - sendrequest.py:140 -[sendrequest:run_main] - 请求地址：https://ua.k5615.comkk/promen/groom/list
+INFO - 2026-04-27 22:24:16,077 - sendrequest.py:141 -[sendrequest:run_main] - 请求方式：Get
+INFO - 2026-04-27 22:24:16,077 - sendrequest.py:142 -[sendrequest:run_main] - 测试用例名称：获取场馆列表
+INFO - 2026-04-27 22:24:16,077 - sendrequest.py:143 -[sendrequest:run_main] - 请求头：{'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'pmtoken': 'None', 'device': '1'}
+INFO - 2026-04-27 22:24:16,077 - sendrequest.py:144 -[sendrequest:run_main] - Cookie：None
+INFO - 2026-04-27 22:24:16,078 - sendrequest.py:154 -[sendrequest:run_main] - 请求参数：{'params': {'page': 1, 'size': 20}}
+ERROR - 2026-04-27 22:24:16,812 - sendrequest.py:114 -[sendrequest:send_request] - ConnectionError--连接异常
+INFO - 2026-04-27 22:24:17,217 - conftest.py:23 -[conftest:start_test_and_end] - -------------接口测试结束--------------
+INFO - 2026-04-27 22:31:34,452 - sendrequest.py:139 -[sendrequest:run_main] - 接口名称：用户登录
+INFO - 2026-04-27 22:31:34,452 - sendrequest.py:140 -[sendrequest:run_main] - 请求地址：https://ua.k5615.com/kk/promen/member/login
+INFO - 2026-04-27 22:31:34,452 - sendrequest.py:141 -[sendrequest:run_main] - 请求方式：post
+INFO - 2026-04-27 22:31:34,453 - sendrequest.py:142 -[sendrequest:run_main] - 测试用例名称：用户名和密码正确登录验证
+INFO - 2026-04-27 22:31:34,453 - sendrequest.py:143 -[sendrequest:run_main] - 请求头：{'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'Device': '1', 'Lang': 'zh', 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36'}
+INFO - 2026-04-27 22:31:34,453 - sendrequest.py:144 -[sendrequest:run_main] - Cookie：None
+INFO - 2026-04-27 22:31:34,453 - sendrequest.py:148 -[sendrequest:run_main] - 请求参数：{'data': {'memberAccount': 'manson001', 'loginPwd': '10d66ccecdf01ccfff2b86cfb1fd2b76'}}
+INFO - 2026-04-27 22:31:36,510 - sendrequest.py:111 -[sendrequest:send_request] - cookie：{'Cookie': {'pmToken': 'e2def3477ac94433b0078a5ab0343285'}}
+INFO - 2026-04-27 22:31:36,511 - sendrequest.py:112 -[sendrequest:send_request] - 接口返回信息：{"code":0,"msg":"in消息_登录成功","data":{"memberId":"1586924314353995831","memberAccount":"manson001","balance":0.00,"tokenName":"pmToken","token":"e2def3477ac94433b0078a5ab0343285"}}
+INFO - 2026-04-27 22:31:36,512 - apiutil.py:156 -[apiutil:extract_data] - 提取接口的返回值：
+INFO - 2026-04-27 22:31:36,513 - assertions.py:170 -[assertions:assert_result] - yaml文件预期结果：[{'contains': {'msg': '登录成功'}}]
+INFO - 2026-04-27 22:31:36,513 - assertions.py:45 -[assertions:contains_assert] - 字符串包含断言成功：预期结果【登录成功】,实际结果【in消息_登录成功】
+INFO - 2026-04-27 22:31:36,514 - assertions.py:198 -[assertions:assert_result] - 测试成功
+INFO - 2026-04-27 22:31:36,515 - conftest.py:21 -[conftest:start_test_and_end] - -------------接口测试开始--------------
+ERROR - 2026-04-27 22:31:36,521 - readyaml.py:113 -[readyaml:get_extract_yaml] - 【extract.yaml】没有找到：pmToken,--'pmToken'
+ERROR - 2026-04-27 22:31:36,523 - readyaml.py:113 -[readyaml:get_extract_yaml] - 【extract.yaml】没有找到：pmToken,--'pmToken'
+INFO - 2026-04-27 22:31:36,524 - sendrequest.py:139 -[sendrequest:run_main] - 接口名称：场馆列表
+INFO - 2026-04-27 22:31:36,524 - sendrequest.py:140 -[sendrequest:run_main] - 请求地址：https://ua.k5615.comkk/promen/groom/list
+INFO - 2026-04-27 22:31:36,524 - sendrequest.py:141 -[sendrequest:run_main] - 请求方式：Get
+INFO - 2026-04-27 22:31:36,524 - sendrequest.py:142 -[sendrequest:run_main] - 测试用例名称：获取场馆列表
+INFO - 2026-04-27 22:31:36,524 - sendrequest.py:143 -[sendrequest:run_main] - 请求头：{'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'pmtoken': 'None', 'device': '1'}
+INFO - 2026-04-27 22:31:36,525 - sendrequest.py:144 -[sendrequest:run_main] - Cookie：None
+INFO - 2026-04-27 22:31:36,525 - sendrequest.py:154 -[sendrequest:run_main] - 请求参数：{'params': {'page': 1, 'size': 20}}
+ERROR - 2026-04-27 22:31:36,631 - sendrequest.py:114 -[sendrequest:send_request] - ConnectionError--连接异常
+INFO - 2026-04-27 22:31:37,055 - conftest.py:23 -[conftest:start_test_and_end] - -------------接口测试结束--------------
+INFO - 2026-04-27 22:33:25,504 - sendrequest.py:139 -[sendrequest:run_main] - 接口名称：用户登录
+INFO - 2026-04-27 22:33:25,504 - sendrequest.py:140 -[sendrequest:run_main] - 请求地址：https://ua.k5615.com/kk/promen/member/login
+INFO - 2026-04-27 22:33:25,505 - sendrequest.py:141 -[sendrequest:run_main] - 请求方式：post
+INFO - 2026-04-27 22:33:25,505 - sendrequest.py:142 -[sendrequest:run_main] - 测试用例名称：用户名和密码正确登录验证
+INFO - 2026-04-27 22:33:25,505 - sendrequest.py:143 -[sendrequest:run_main] - 请求头：{'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'Device': '1', 'Lang': 'zh', 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36'}
+INFO - 2026-04-27 22:33:25,505 - sendrequest.py:144 -[sendrequest:run_main] - Cookie：None
+INFO - 2026-04-27 22:33:25,505 - sendrequest.py:148 -[sendrequest:run_main] - 请求参数：{'data': {'memberAccount': 'manson001', 'loginPwd': '10d66ccecdf01ccfff2b86cfb1fd2b76'}}
+INFO - 2026-04-27 22:33:28,840 - sendrequest.py:111 -[sendrequest:send_request] - cookie：{'Cookie': {'pmToken': '793c457adc4a4c69a177040d4ed0e7a3'}}
+INFO - 2026-04-27 22:33:28,841 - sendrequest.py:112 -[sendrequest:send_request] - 接口返回信息：{"code":0,"msg":"in消息_登录成功","data":{"memberId":"1586924314353995831","memberAccount":"manson001","balance":0.00,"tokenName":"pmToken","token":"793c457adc4a4c69a177040d4ed0e7a3"}}
+INFO - 2026-04-27 22:33:28,842 - apiutil.py:156 -[apiutil:extract_data] - 提取接口的返回值：
+INFO - 2026-04-27 22:33:28,846 - assertions.py:170 -[assertions:assert_result] - yaml文件预期结果：[{'contains': {'msg': '登录成功'}}]
+INFO - 2026-04-27 22:33:28,847 - assertions.py:45 -[assertions:contains_assert] - 字符串包含断言成功：预期结果【登录成功】,实际结果【in消息_登录成功】
+INFO - 2026-04-27 22:33:28,847 - assertions.py:198 -[assertions:assert_result] - 测试成功
+INFO - 2026-04-27 22:33:28,848 - conftest.py:21 -[conftest:start_test_and_end] - -------------接口测试开始--------------
+INFO - 2026-04-27 22:33:28,855 - sendrequest.py:139 -[sendrequest:run_main] - 接口名称：场馆列表
+INFO - 2026-04-27 22:33:28,856 - sendrequest.py:140 -[sendrequest:run_main] - 请求地址：https://ua.k5615.comkk/promen/groom/list
+INFO - 2026-04-27 22:33:28,856 - sendrequest.py:141 -[sendrequest:run_main] - 请求方式：Get
+INFO - 2026-04-27 22:33:28,856 - sendrequest.py:142 -[sendrequest:run_main] - 测试用例名称：获取场馆列表
+INFO - 2026-04-27 22:33:28,856 - sendrequest.py:143 -[sendrequest:run_main] - 请求头：{'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'pmtoken': '793c457adc4a4c69a177040d4ed0e7a3', 'device': '1'}
+INFO - 2026-04-27 22:33:28,856 - sendrequest.py:144 -[sendrequest:run_main] - Cookie：None
+INFO - 2026-04-27 22:33:28,857 - sendrequest.py:154 -[sendrequest:run_main] - 请求参数：{'params': {'page': 1, 'size': 20}}
+ERROR - 2026-04-27 22:33:29,300 - sendrequest.py:114 -[sendrequest:send_request] - ConnectionError--连接异常
+INFO - 2026-04-27 22:33:29,683 - conftest.py:23 -[conftest:start_test_and_end] - -------------接口测试结束--------------
+INFO - 2026-04-27 22:43:32,532 - sendrequest.py:139 -[sendrequest:run_main] - 接口名称：用户登录
+INFO - 2026-04-27 22:43:32,532 - sendrequest.py:140 -[sendrequest:run_main] - 请求地址：https://ua.k5615.com/kk/promen/member/login
+INFO - 2026-04-27 22:43:32,532 - sendrequest.py:141 -[sendrequest:run_main] - 请求方式：post
+INFO - 2026-04-27 22:43:32,532 - sendrequest.py:142 -[sendrequest:run_main] - 测试用例名称：用户名和密码正确登录验证
+INFO - 2026-04-27 22:43:32,532 - sendrequest.py:143 -[sendrequest:run_main] - 请求头：{'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'Device': '1', 'Lang': 'zh', 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36'}
+INFO - 2026-04-27 22:43:32,532 - sendrequest.py:144 -[sendrequest:run_main] - Cookie：None
+INFO - 2026-04-27 22:43:32,533 - sendrequest.py:148 -[sendrequest:run_main] - 请求参数：{'data': {'memberAccount': 'manson001', 'loginPwd': '10d66ccecdf01ccfff2b86cfb1fd2b76'}}
+INFO - 2026-04-27 22:43:35,800 - sendrequest.py:111 -[sendrequest:send_request] - cookie：{'Cookie': {'pmToken': '31490f109c134465b86a0829b7bc7c41'}}
+INFO - 2026-04-27 22:43:35,800 - sendrequest.py:112 -[sendrequest:send_request] - 接口返回信息：{"code":0,"msg":"in消息_登录成功","data":{"memberId":"1586924314353995831","memberAccount":"manson001","balance":0.00,"tokenName":"pmToken","token":"31490f109c134465b86a0829b7bc7c41"}}
+INFO - 2026-04-27 22:43:35,801 - apiutil.py:156 -[apiutil:extract_data] - 提取接口的返回值：
+INFO - 2026-04-27 22:43:35,807 - assertions.py:170 -[assertions:assert_result] - yaml文件预期结果：[{'contains': {'msg': '登录成功'}}]
+INFO - 2026-04-27 22:43:35,808 - assertions.py:45 -[assertions:contains_assert] - 字符串包含断言成功：预期结果【登录成功】,实际结果【in消息_登录成功】
+INFO - 2026-04-27 22:43:35,809 - assertions.py:198 -[assertions:assert_result] - 测试成功
+INFO - 2026-04-27 22:43:35,810 - conftest.py:21 -[conftest:start_test_and_end] - -------------接口测试开始--------------
+INFO - 2026-04-27 22:43:35,818 - sendrequest.py:139 -[sendrequest:run_main] - 接口名称：场馆列表
+INFO - 2026-04-27 22:43:35,819 - sendrequest.py:140 -[sendrequest:run_main] - 请求地址：https://ua.k5615.comkk/promen/groom/list
+INFO - 2026-04-27 22:43:35,819 - sendrequest.py:141 -[sendrequest:run_main] - 请求方式：Get
+INFO - 2026-04-27 22:43:35,819 - sendrequest.py:142 -[sendrequest:run_main] - 测试用例名称：获取场馆列表
+INFO - 2026-04-27 22:43:35,819 - sendrequest.py:143 -[sendrequest:run_main] - 请求头：{'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'pmtoken': '31490f109c134465b86a0829b7bc7c41', 'device': '1'}
+INFO - 2026-04-27 22:43:35,819 - sendrequest.py:144 -[sendrequest:run_main] - Cookie：None
+INFO - 2026-04-27 22:43:35,820 - sendrequest.py:154 -[sendrequest:run_main] - 请求参数：{'params': {'page': 1, 'size': 20}}
+ERROR - 2026-04-27 22:43:36,717 - sendrequest.py:114 -[sendrequest:send_request] - ConnectionError--连接异常
+INFO - 2026-04-27 22:43:37,127 - conftest.py:23 -[conftest:start_test_and_end] - -------------接口测试结束--------------

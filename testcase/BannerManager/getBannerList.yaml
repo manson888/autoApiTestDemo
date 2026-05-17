@@ -1,0 +1,22 @@
+- baseInfo:
+    system: user
+    api_name: 查询首页轮播图
+    url: /kk/promen/biz/banner/list
+    method: Get
+    header:
+      Content-Type: application/x-www-form-urlencoded;charset=UTF-8
+      pmtoken: ${get_extract_data(user_token)}
+      device: '1'
+  testCase:
+    - case_name: 查询首页轮播图-成功
+      validation:
+        - eq: { 'code': 0 }
+        # 框架的 contains 断言会用 jsonpath 提取 url 字段的值并拼接，这里校验是否包含 http
+        - contains: { 'url': 'http' }
+    
+    - case_name: 查询首页轮播图-携带非法或多余的query参数
+      params:
+        invalid_param: 123
+      validation:
+        # 断言接口健壮性，依然能够正常返回 JSON code为 0 或其他正常错误码，不抛出500
+        - contains: { 'status_code': 200 }

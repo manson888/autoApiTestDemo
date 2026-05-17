@@ -61,8 +61,17 @@ class RequestBase:
         :return:
         """
         try:
+            import os
             params_type = ['data', 'json', 'params']
-            url_host = self.conf.get_section_for_data('api_dev', 'host')
+            
+            # 1. 动态获取环境和子系统标识
+            current_env = os.environ.get("TEST_ENV", "dev") 
+            system_type = base_info.get('system', 'user') # 默认去前台(user)
+            section_name = f"{current_env}_{system_type}"
+            
+            # 2. 从 config.ini 读取对应的 host
+            url_host = self.conf.get_section_for_data(section_name, 'host')
+            
             api_name = base_info['api_name']
             allure.attach(api_name, f'接口名称：{api_name}', allure.attachment_type.TEXT)
             url = url_host + base_info['url']

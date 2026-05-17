@@ -6,8 +6,11 @@ import webbrowser
 from conf.setting import REPORT_TYPE, USE_XDIST, XDIST_WORKERS
 
 if __name__ == '__main__':
-    # 基础运行参数
-    pytest_args = ['-s', '-v']
+    # 在这里指定你想运行的环境，想跑线上就改成 "prod"
+    ENV = "dev"
+    
+    # 基础运行参数，追加自定义的 --env 
+    pytest_args = ['-s', '-v', f'--env={ENV}']
     
     # 动态判断是否追加分布式参数
     if USE_XDIST:
