@@ -12,6 +12,7 @@ from pandas.tseries.offsets import Day
 from common.operationcsv import read_csv
 from common.readyaml import ReadYamlData
 import csv
+import pyotp
 
 
 class DebugTalk:
@@ -106,6 +107,17 @@ class DebugTalk:
         """获取当前的时间戳，13位"""
         t = int(time.time()) * 1000
         return t
+
+    def get_google_code(self, secret_key):
+        """
+        根据谷歌验证器的秘钥(Base32字符串)动态生成6位验证码
+        :param secret_key: 绑定的秘钥，通常为16或32位大写字母和数字的组合
+        """
+        try:
+            totp = pyotp.TOTP(secret_key)
+            return totp.now()
+        except Exception as e:
+            return f"生成验证码失败: {e}"
 
     def start_time(self):
         """获取当前时间的前一天标准时间"""

@@ -8,6 +8,7 @@ from common.recordlog import logs
 from common.connection import ConnectMysql
 from conf.operationConfig import OperationConfig
 from common.sendrequest import SendRequest
+from common.debugtalk import DebugTalk
 
 """
 -function：每一个函数或方法都会调用
@@ -58,6 +59,23 @@ def global_auto_login():
                 token = res_user.json().get("data", {}).get("token")
                 yfd.write_yaml_data({"user_token": token})
 
+        # # ======== 2. 客服端登录 ========
+        # admin_host = conf.get_section_for_data(f"{env}_admin", "host")
+        # admin_acc = accounts.get("admin")
+        # if admin_acc:
+        #     # 💡 实例化你的函数库，动态算出 6 位谷歌验证码
+        #     ga_code = DebugTalk().get_google_code(admin_acc["ga_secret"])
+            
+        #     res_admin = req.run_main("客服端登录", f"{admin_host}/api/admin/login", "客服登录",
+        #                              header={"Content-Type": "application/json"},
+        #                              method="Post",
+        #                              json={
+        #                                  "username": admin_acc["username"], 
+        #                                  "password": admin_acc["password"],
+        #                                  "googleCode": ga_code   # 💡 这里把算出来的验证码传给后端
+        #                              })
+
+
         # ======== 2. 客服端登录 (暂时注释，等写好了再放开) ========
         # admin_host = conf.get_section_for_data(f"{env}_admin", "host")
         # admin_acc = accounts.get("admin")
@@ -69,6 +87,8 @@ def global_auto_login():
         #     if res_admin and res_admin.status_code == 200:
         #         token = res_admin.json().get("data", {}).get("token")
         #         yfd.write_yaml_data({"admin_token": token})
+
+
             
         # ======== 3. 商户端登录 (暂时注释，等写好了再放开) ========
         # partner_host = conf.get_section_for_data(f"{env}_partner", "host")

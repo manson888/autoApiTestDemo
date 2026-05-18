@@ -104,3 +104,4 @@ Werkzeug==2.2.3
 yarg==0.1.9
 zipp==3.15.0
 zstd==1.5.7.3
+pyotp==2.9.0
