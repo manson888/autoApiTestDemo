@@ -115,26 +115,51 @@ class RequestBase:
                     allure.attach(json.dumps(file), '导入文件')
                     files = {fk: open(fv, mode='rb')}
 
-            res = self.run.run_main(name=api_name, url=url, case_name=case_name, header=header, method=method,
-                                    file=files, cookies=cookie, **test_case)
-            print(res.text)
-            status_code = res.status_code
-            allure.attach(self.allure_attach_response(res.json()), '接口响应信息', allure.attachment_type.TEXT)
+            # ---------------- 动态轮询等待机制 ----------------
+            polling_config = test_case.pop('polling', None)
+            max_retries = 1
+            interval = 0
+            if polling_config:
+                max_retries = int(polling_config.get('max_retries', 12))  # 默认重试 12 次
+                interval = int(polling_config.get('interval', 5))  # 默认每次间隔 5 秒
+                logs.info(f"开启轮询模式：最大重试 {max_retries} 次，每次间隔 {interval} 秒")
 
-            try:
-                res_json = json.loads(res.text)  # 把json格式转换成字典字典
-                if extract is not None:
-                    self.extract_data(extract, res.text)
-                if extract_list is not None:
-                    self.extract_data_list(extract_list, res.text)
-                # 处理断言
-                self.asserts.assert_result(validation, res_json, status_code)
-            except JSONDecodeError as js:
-                logs.error('系统异常或接口未请求！')
-                raise js
-            except Exception as e:
-                logs.error(e)
-                raise e
+            for attempt in range(max_retries):
+                res = self.run.run_main(name=api_name, url=url, case_name=case_name, header=header, method=method,
+                                        file=files, cookies=cookie, **test_case)
+                print(res.text)
+                status_code = res.status_code
+
+                try:
+                    res_json = json.loads(res.text)
+                    # 先校验断言是否通过
+                    self.asserts.assert_result(validation, res_json, status_code)
+                    
+                    # 只有断言成功了，才提取数据和附加报告
+                    allure.attach(self.allure_attach_response(res_json), f'接口响应信息(第 {attempt + 1} 次尝试成功)', allure.attachment_type.TEXT)
+                    if extract is not None:
+                        self.extract_data(extract, res.text)
+                    if extract_list is not None:
+                        self.extract_data_list(extract_list, res.text)
+                    break  # 成功则跳出轮询
+                    
+                except AssertionError as ae:
+                    if attempt < max_retries - 1:
+                        logs.info(f"第 {attempt + 1} 次请求业务状态尚未满足，等待 {interval} 秒后重试...")
+                        import time
+                        time.sleep(interval)
+                        continue
+                    else:
+                        allure.attach(self.allure_attach_response(res_json), '接口响应信息(轮询最终失败)', allure.attachment_type.TEXT)
+                        logs.error("业务状态轮询超时，最终判定失败！")
+                        raise ae
+                except JSONDecodeError as js:
+                    logs.error('系统异常或接口响应非 JSON 格式！')
+                    raise js
+                except Exception as e:
+                    logs.error(e)
+                    raise e
+            # ------------------------------------------------
 
         except Exception as e:
             raise e
